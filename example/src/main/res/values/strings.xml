@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">BeRetained</string>
+    <string name="retained">Instances retained</string>
+    <string name="not_retained">Instances not retained</string>
 </resources>

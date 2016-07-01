@@ -89,12 +89,12 @@ public class BeRetainedProcessor extends AbstractProcessor {
             retainEnabledClassesMap.put(enclosingClass, enclosingClassType);
             retainEnabledClasses.add(enclosingClassType);
 
-            List<com.woodblockwithoutco.beretained.info.FieldDescription> fields = classFieldMap.get(enclosingClass);
+            List<FieldDescription> fields = classFieldMap.get(enclosingClass);
             if (fields == null) {
                 fields = new ArrayList<>();
                 classFieldMap.put(enclosingClass, fields);
             }
-            fields.add(new com.woodblockwithoutco.beretained.info.FieldDescription(fieldClass, fieldName));
+            fields.add(new FieldDescription(fieldClass, fieldName));
         }
 
         for (TypeName clazz : classFieldMap.keySet()) {
