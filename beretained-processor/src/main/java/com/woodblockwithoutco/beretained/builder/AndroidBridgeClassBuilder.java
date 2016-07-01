@@ -57,7 +57,7 @@ public class AndroidBridgeClassBuilder extends SaveRestoreClassBuilder {
                 addStatement("$T container = ($T) fm.findFragmentByTag($S)", beRetainedFragmentClass, beRetainedFragmentClass, fragmentManagerTag).
                 beginControlFlow("if(container == null)").
                 addStatement("container = new $T()", beRetainedFragmentClass).
-                addStatement("fm.beginTransaction().add(($T)container, $S).commit()", AndroidClasses.ANDROID_SUPPORT_V4_APP_FRAGMENT_CLASS, fragmentManagerTag).
+                addStatement("fm.beginTransaction().add(container, $S).commit()", fragmentManagerTag).
                 endControlFlow().
                 addStatement("return container.restore($L)", targetArgName);
 
