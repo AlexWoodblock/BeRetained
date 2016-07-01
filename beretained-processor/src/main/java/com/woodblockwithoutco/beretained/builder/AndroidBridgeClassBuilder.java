@@ -77,11 +77,4 @@ public class AndroidBridgeClassBuilder extends SaveRestoreClassBuilder {
         restoreMethodSkeleton.addModifiers(Modifier.STATIC);
         return restoreMethodSkeleton;
     }
-
-    private String getSaveRestoreCallerFieldName(ClassName cls) {
-        String uppercasePackage = cls.packageName().toUpperCase();
-        String uppercasePackageWithUnderscores = uppercasePackage.replace('.', '_');
-        String uppercaseClassName = cls.simpleName().toUpperCase();
-        return uppercasePackageWithUnderscores + "_" + uppercaseClassName + "_SAVE_RESTORE_CALLER";
-    }
 }

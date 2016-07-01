@@ -17,7 +17,10 @@ abstract class SuperClassAwareSaveRestoreClassBuilder extends SaveRestoreClassBu
 
     protected TypeName closestSuperBeRetainedFragment;
 
-    public SuperClassAwareSaveRestoreClassBuilder(TypeMirror enclosingClassType, Messager m, Collection<TypeMirror> superRetainEnabledTypes, Types typeUtils) {
+    public SuperClassAwareSaveRestoreClassBuilder(TypeMirror enclosingClassType,
+                                                  Messager m,
+                                                  Collection<TypeMirror> superRetainEnabledTypes,
+                                                  Types typeUtils) {
         super(enclosingClassType, m);
 
         closestSuperBeRetainedFragment = SuperBeRetainedFragmentTypeFinder.getSuperBeRetainedFragment(enclosingClassType,
