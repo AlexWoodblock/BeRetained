@@ -49,6 +49,11 @@ public class SubMainActivity extends MainActivity {
     }
 
     @Override
+    protected void fieldsRetainerOnCreate() {
+        SubMainActivityFieldsRetainer.onCreate(this);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         //no menu needed
         return false;

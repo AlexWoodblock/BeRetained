@@ -56,8 +56,9 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //.restore() must be called at least once in onCreate().
-        //This will probably be changed in the future to dedicated onCreate() call.
+        //we must always call <ActivityName>FieldsRetainer.onCreate()
+        fieldsRetainerOnCreate();
+
         boolean wasRestored = restoreState();
         if(wasRestored) {
             setTitle(R.string.retained);
@@ -146,6 +147,10 @@ public class MainActivity extends AppCompatActivity {
 
     protected void saveState() {
         MainActivityFieldsRetainer.save(this);
+    }
+
+    protected void fieldsRetainerOnCreate() {
+        MainActivityFieldsRetainer.onCreate(this);
     }
 
 }
