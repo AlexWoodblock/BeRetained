@@ -63,7 +63,7 @@ public class SupportBeRetainedFragmentClassBuilder extends SuperClassAwareSaveRe
 
         for(FieldDescription field : fields) {
             if(!field.nullAllowed) {
-                builder.beginControlFlow("if($L == null)", field.name);
+                builder.beginControlFlow("if($L.$L == null)", sourceArgName, field.name);
                 builder.addStatement("throw new $T($S)",
                         ClassName.get(NullPointerException.class),
                         "Trying to save null value from @NonNull field " + field.name);
