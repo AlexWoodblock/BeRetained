@@ -16,7 +16,7 @@
     specific language governing permissions and limitations
     under the License.
  */
-package com.woodblockwithoutco.beretained;
+package com.woodblockwithoutco.beretainedexample;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -31,7 +31,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.woodblockwithouco.beretained.Retain;
-import com.woodblockwithoutco.beretained.widget.RecyclerViewFragment;
+import com.woodblockwithoutco.beretained.BeRetained;
+import com.woodblockwithoutco.beretainedexample.widget.RecyclerViewFragment;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -56,17 +57,17 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //we must always call <ActivityName>FieldsRetainer.onCreate()
-        fieldsRetainerOnCreate();
+        //we must always call BeRetained.onCreate()
+        BeRetained.onCreate(this);
 
-        boolean wasRestored = restoreState();
+        boolean wasRestored = BeRetained.restore(this);
         if(wasRestored) {
             setTitle(R.string.retained);
         } else {
             setTitle(R.string.not_retained);
-
-            fillInitialValues();
         }
+
+        fillInitialValues();
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         RecyclerViewFragment recyclerViewFragment = (RecyclerViewFragment) fragmentManager.findFragmentById(R.id.container);
@@ -81,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        saveState();
+        BeRetained.save(this);
     }
 
     @Override
@@ -133,24 +134,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     protected void fillInitialValues() {
-        mIntArray = new int[] {0, 1, 2, 3};
-        mObject = new Object();
-        mMap = new HashMap<>();
-        mMap.put("testkey1", "testvalue1");
-        mMap.put("testkey2", "testvalue2");
-        mMap.put("testkey3", "testvalue3");
-    }
+        if(mIntArray == null) {
+            mIntArray = new int[]{0, 1, 2, 3};
+        }
 
-    protected boolean restoreState() {
-        return MainActivityFieldsRetainer.restore(this);
-    }
+        if(mObject == null) {
+            mObject = new Object();
+        }
 
-    protected void saveState() {
-        MainActivityFieldsRetainer.save(this);
-    }
-
-    protected void fieldsRetainerOnCreate() {
-        MainActivityFieldsRetainer.onCreate(this);
+        if(mMap == null) {
+            mMap = new HashMap<>();
+            mMap.put("testkey1", "testvalue1");
+            mMap.put("testkey2", "testvalue2");
+            mMap.put("testkey3", "testvalue3");
+        }
     }
 
 }

@@ -35,4 +35,5 @@ public final class AndroidClasses {
     public static final ClassName ANDROID_SUPPORT_V4_APP_FRAGMENT_MANAGER_CLASS = ClassName.get("android.support.v4.app", "FragmentManager");
     public static final ClassName ANDROID_SUPPORT_V4_APP_FRAGMENT_CLASS = ClassName.get("android.support.v4.app", "Fragment");
     public static final ClassName ANDROID_OS_BUNDLE_CLASS = ClassName.get("android.os", "Bundle");
+    public static final ClassName COM_WOODBLOCKWITHOUTCO_BERETAINED_FIELDS_RETAINER = ClassName.get("com.woodblockwithoutco.beretained", "FieldsRetainer");
 }

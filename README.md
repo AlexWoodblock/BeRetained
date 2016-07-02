@@ -17,21 +17,52 @@ public class SampleActivity extends FragmentActivity {
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
     
-        SampleActivityFieldsRetainer.onCreate(this);
-    
-        boolean restored = SampleActivityFieldsRetainer.restore(this);
-        if(!restored) {
-            //create all the objects from scratch, as they either weren't saved or Activity was completely destroyed
-            ...
-        }
+        BeRetained.onCreate(this);
+        BeRetained.restore(this);
+        //check if you have all necessary objects after restoration, if not - recreate them from scratch
+        …
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        SampleActivityFieldsRetainer.save(this);
+        BeRetained.save(this);
     }
 }
 ```
 
 **Please note:** during first run you will not have class SampleActivityFieldsRetainer. To get this file to be generated, you need to build your project once first. You also need to rebuild project every time you'll add new Activity with @Retain fields.
+
+If you have subclass of Activity that have @Retain fields in it, you don't need to anything extra - just subclass it:
+```
+public class SampleActivity extends FragmentActivity {
+
+    @Retain
+    Object mObjectToRetain;
+    
+    @Override
+    public void onCreate(Bundle icicle) {
+        super.onCreate(icicle);
+    
+        BeRetained.onCreate(this);
+        BeRetained.restore(this);
+        //check if you have all necessary objects after restoration, if not - recreate them from scratch
+        …
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        BeRetained.save(this);
+    }
+}
+
+public class SubclassSampleActivity extends SampleActivity {
+
+    @Retain
+    Object mSecondObject;
+
+}
+```
+
+And that's it! Both objects from superclass and inherited class will be retained.

@@ -16,8 +16,9 @@
     specific language governing permissions and limitations
     under the License.
  */
-package com.woodblockwithoutco.beretained;
+package com.woodblockwithoutco.beretainedexample;
 
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -33,24 +34,18 @@ import java.util.LinkedList;
  * you call generated save/restore methods for subclass.
  */
 public class SubMainActivity extends MainActivity {
-
+    
     @Retain
     @NonNull
     LinkedList<String> mStringLinkedList;
 
     @Override
-    protected boolean restoreState() {
-        return SubMainActivityFieldsRetainer.restore(this);
-    }
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-    @Override
-    protected void saveState() {
-        SubMainActivityFieldsRetainer.save(this);
-    }
-
-    @Override
-    protected void fieldsRetainerOnCreate() {
-        SubMainActivityFieldsRetainer.onCreate(this);
+        if(mStringLinkedList == null) {
+            mStringLinkedList = new LinkedList<>();
+        }
     }
 
     @Override
@@ -97,7 +92,9 @@ public class SubMainActivity extends MainActivity {
     protected void fillInitialValues() {
         super.fillInitialValues();
 
-        mStringLinkedList = new LinkedList<>();
+        if(mStringLinkedList == null) {
+            mStringLinkedList = new LinkedList<>();
+        }
     }
 
 }
