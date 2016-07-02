@@ -26,6 +26,7 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
+import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
@@ -94,7 +95,20 @@ public class BeRetainedProcessor extends AbstractProcessor {
                 fields = new ArrayList<>();
                 classFieldMap.put(enclosingClass, fields);
             }
-            fields.add(new FieldDescription(fieldClass, fieldName));
+
+            List<? extends AnnotationMirror> annotationMirrors = field.getAnnotationMirrors();
+            boolean nullAllowed = true;
+            for(AnnotationMirror annotationMirror : annotationMirrors) {
+                if(annotationMirror.toString().equals(AndroidClasses.ANDROID_SUPPORT_ANNOTATION_NON_NULL)) {
+                    nullAllowed = false;
+                }
+
+                if(!nullAllowed) {
+                    break;
+                }
+            }
+
+            fields.add(new FieldDescription(fieldClass, fieldName, nullAllowed));
         }
 
         for (TypeName clazz : classFieldMap.keySet()) {

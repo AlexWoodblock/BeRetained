@@ -1,5 +1,6 @@
 package com.woodblockwithoutco.beretained.builder;
 
+import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
@@ -61,6 +62,14 @@ public class SupportBeRetainedFragmentClassBuilder extends SuperClassAwareSaveRe
         }
 
         for(FieldDescription field : fields) {
+            if(!field.nullAllowed) {
+                builder.beginControlFlow("if($L == null)", field.name);
+                builder.addStatement("throw new $T($S)",
+                        ClassName.get(NullPointerException.class),
+                        "Trying to save null value in @NonNull field " + field.name);
+                builder.endControlFlow();
+            }
+
             builder.addStatement("$L = $L.$L", field.name, sourceArgName, field.name);
         }
         return builder.build();
