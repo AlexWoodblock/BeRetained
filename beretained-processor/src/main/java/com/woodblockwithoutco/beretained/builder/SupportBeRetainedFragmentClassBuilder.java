@@ -150,9 +150,8 @@ public class SupportBeRetainedFragmentClassBuilder extends SuperBeRetainedFragme
         super.addBody();
 
         //adding fields that will keep the instances
-        //TODO: maybe change modifier to private?
         for(RetainedFieldDescription field : fields) {
-            FieldSpec.Builder fieldSpecBuilder = FieldSpec.builder(TypeName.get(field.type), field.name, Modifier.PROTECTED);
+            FieldSpec.Builder fieldSpecBuilder = FieldSpec.builder(TypeName.get(field.type), field.name, Modifier.PRIVATE);
             saveRestoreClassBuilder.addField(fieldSpecBuilder.build());
         }
 
