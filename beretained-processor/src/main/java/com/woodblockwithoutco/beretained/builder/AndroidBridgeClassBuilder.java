@@ -21,6 +21,7 @@ package com.woodblockwithoutco.beretained.builder;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterSpec;
 import com.woodblockwithoutco.beretained.android.AndroidClasses;
 import com.woodblockwithoutco.beretained.android.Suffixes;
 
@@ -57,10 +58,10 @@ public class AndroidBridgeClassBuilder extends SaveRestoreClassBuilder {
         //finding fragment, if it's null - throwing exception, if it's there - put instances into it
         //TODO: generate JavaDoc for the method
         CodeBlock.Builder saveCode = CodeBlock.builder().
-                addStatement("$T fm = source.getSupportFragmentManager()", AndroidClasses.ANDROID_SUPPORT_V4_APP_FRAGMENT_MANAGER_CLASS).
+                addStatement("$T fm = $L.getSupportFragmentManager()", AndroidClasses.ANDROID_SUPPORT_V4_APP_FRAGMENT_MANAGER_CLASS, sourceArgName).
                 addStatement("$T fragment = ($T) fm.findFragmentByTag($S)", beRetainedFragmentClass, beRetainedFragmentClass, fragmentManagerTag).
                 beginControlFlow("if (fragment == null)").
-                addStatement("throw new NullPointerException($S)", "Did you forget to call FieldsRetainer.restore() inside onCreate(Bundle) method?").
+                addStatement("throw new NullPointerException($S)", "Did you forget to call " + enclosingClass.simpleName() + Suffixes.FIELDS_RETAINER_SUFFIX + ".onCreate() inside onCreate(Bundle) method?").
                 endControlFlow().
                 addStatement("fragment.save($L)", sourceArgName);
 
@@ -73,11 +74,10 @@ public class AndroidBridgeClassBuilder extends SaveRestoreClassBuilder {
         //and after all try to restore instances from it.
         //TODO: generate JavaDoc for the method
         CodeBlock.Builder restoreCode = CodeBlock.builder().
-                addStatement("$T fm = target.getSupportFragmentManager()", AndroidClasses.ANDROID_SUPPORT_V4_APP_FRAGMENT_MANAGER_CLASS).
+                addStatement("$T fm = $L.getSupportFragmentManager()", AndroidClasses.ANDROID_SUPPORT_V4_APP_FRAGMENT_MANAGER_CLASS, targetArgName).
                 addStatement("$T fragment = ($T) fm.findFragmentByTag($S)", beRetainedFragmentClass, beRetainedFragmentClass, fragmentManagerTag).
                 beginControlFlow("if(fragment == null)").
-                addStatement("fragment = new $T()", beRetainedFragmentClass).
-                addStatement("fm.beginTransaction().add(fragment, $S).commit()", fragmentManagerTag).
+                addStatement("throw new NullPointerException($S)", "Did you forget to call " + enclosingClass.simpleName() + Suffixes.FIELDS_RETAINER_SUFFIX + ".onCreate() inside onCreate(Bundle) method?").
                 endControlFlow().
                 addStatement("return fragment.restore($L)", targetArgName);
 
@@ -95,6 +95,27 @@ public class AndroidBridgeClassBuilder extends SaveRestoreClassBuilder {
                 build();
 
         saveRestoreClassBuilder.addMethod(privateConstructor);
+
+        //adding onCreate method to add fragment
+        final String activityArgName = "activity";
+        CodeBlock.Builder onCreateCode = CodeBlock.builder().
+                addStatement("$T fm = $L.getSupportFragmentManager()", AndroidClasses.ANDROID_SUPPORT_V4_APP_FRAGMENT_MANAGER_CLASS, activityArgName).
+                addStatement("$T fragment = ($T) fm.findFragmentByTag($S)", beRetainedFragmentClass, beRetainedFragmentClass, fragmentManagerTag).
+                beginControlFlow("if(fragment == null)").
+                addStatement("fragment = new $T()", beRetainedFragmentClass).
+                addStatement("fm.beginTransaction().add(fragment, $S).commit()", fragmentManagerTag).
+                addStatement("fm.executePendingTransactions()").
+                endControlFlow();
+
+        ParameterSpec.Builder activityParameter = ParameterSpec.builder(enclosingClass, activityArgName);
+        MethodSpec onCreateMethod = MethodSpec.
+                methodBuilder("onCreate").
+                addParameter(activityParameter.build()).
+                addCode(onCreateCode.build()).
+                addModifiers(Modifier.PUBLIC, Modifier.STATIC).
+                build();
+
+        saveRestoreClassBuilder.addMethod(onCreateMethod);
     }
 
     @Override
