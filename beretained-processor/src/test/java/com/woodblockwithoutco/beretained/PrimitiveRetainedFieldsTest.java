@@ -18,9 +18,8 @@
  */
 package com.woodblockwithoutco.beretained;
 
-import org.junit.Test;
 import org.junit.Assert;
-import org.junit.runner.RunWith;
+import org.junit.Test;
 
 public class PrimitiveRetainedFieldsTest {
 

@@ -25,14 +25,10 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
-import com.woodblockwithoutco.beretained.utils.SuperBeRetainedFragmentTypeFinder;
-
-import java.util.Collection;
 
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.type.TypeMirror;
-import javax.lang.model.util.Types;
 
 import static javax.tools.Diagnostic.Kind.ERROR;
 
