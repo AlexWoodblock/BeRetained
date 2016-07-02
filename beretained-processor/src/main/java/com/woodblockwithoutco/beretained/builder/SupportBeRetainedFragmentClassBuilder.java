@@ -66,7 +66,7 @@ public class SupportBeRetainedFragmentClassBuilder extends SuperClassAwareSaveRe
                 builder.beginControlFlow("if($L == null)", field.name);
                 builder.addStatement("throw new $T($S)",
                         ClassName.get(NullPointerException.class),
-                        "Trying to save null value in @NonNull field " + field.name);
+                        "Trying to save null value from @NonNull field " + field.name);
                 builder.endControlFlow();
             }
 
@@ -91,6 +91,13 @@ public class SupportBeRetainedFragmentClassBuilder extends SuperClassAwareSaveRe
         String restoreStateFieldName = closestSuperBeRetainedFragment != null ? "restored" : WAS_SAVED_FIELD_NAME;
         builder.beginControlFlow("if($L)", restoreStateFieldName);
         for(FieldDescription field : fields) {
+            if(!field.nullAllowed) {
+                builder.beginControlFlow("if($L == null)", field.name);
+                builder.addStatement("throw new $T($S)",
+                        ClassName.get(NullPointerException.class),
+                        "Trying to restore restore null value to @NonNull field " + field.name);
+                builder.endControlFlow();
+            }
             builder.addStatement("$L.$L = $L", targetArgName, field.name, field.name);
         }
         builder.endControlFlow();
