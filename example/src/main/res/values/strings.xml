@@ -1,5 +1,6 @@
 <resources>
-    <string name="app_name">BeRetained</string>
+    <string name="app_name">BeRetained Example</string>
     <string name="retained">Instances retained</string>
     <string name="not_retained">Instances not retained</string>
+    <string name="open_sub_main_activity">Open subclass Activity</string>
 </resources>
