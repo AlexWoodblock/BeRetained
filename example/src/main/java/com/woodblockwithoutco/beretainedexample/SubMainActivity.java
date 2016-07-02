@@ -18,6 +18,7 @@
  */
 package com.woodblockwithoutco.beretainedexample;
 
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -33,10 +34,19 @@ import java.util.LinkedList;
  * you call generated save/restore methods for subclass.
  */
 public class SubMainActivity extends MainActivity {
-
+    
     @Retain
     @NonNull
     LinkedList<String> mStringLinkedList;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if(mStringLinkedList == null) {
+            mStringLinkedList = new LinkedList<>();
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -82,7 +92,9 @@ public class SubMainActivity extends MainActivity {
     protected void fillInitialValues() {
         super.fillInitialValues();
 
-        mStringLinkedList = new LinkedList<>();
+        if(mStringLinkedList == null) {
+            mStringLinkedList = new LinkedList<>();
+        }
     }
 
 }

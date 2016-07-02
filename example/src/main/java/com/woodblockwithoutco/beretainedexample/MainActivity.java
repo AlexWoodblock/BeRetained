@@ -65,9 +65,9 @@ public class MainActivity extends AppCompatActivity {
             setTitle(R.string.retained);
         } else {
             setTitle(R.string.not_retained);
-
-            fillInitialValues();
         }
+
+        fillInitialValues();
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         RecyclerViewFragment recyclerViewFragment = (RecyclerViewFragment) fragmentManager.findFragmentById(R.id.container);
@@ -134,12 +134,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     protected void fillInitialValues() {
-        mIntArray = new int[] {0, 1, 2, 3};
-        mObject = new Object();
-        mMap = new HashMap<>();
-        mMap.put("testkey1", "testvalue1");
-        mMap.put("testkey2", "testvalue2");
-        mMap.put("testkey3", "testvalue3");
+        if(mIntArray == null) {
+            mIntArray = new int[]{0, 1, 2, 3};
+        }
+
+        if(mObject == null) {
+            mObject = new Object();
+        }
+
+        if(mMap == null) {
+            mMap = new HashMap<>();
+            mMap.put("testkey1", "testvalue1");
+            mMap.put("testkey2", "testvalue2");
+            mMap.put("testkey3", "testvalue3");
+        }
     }
 
 }
