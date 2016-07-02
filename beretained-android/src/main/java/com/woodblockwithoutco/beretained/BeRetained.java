@@ -24,7 +24,44 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Class that contains static helper methods to handle retaining of
+ * non-Parcelable objects via retained Fragments.
+ *
+ * As this class is using retained fragments, please understand that
+ * retained objects will only survive configuration changes - in low memory conditions
+ * or some other conditions where Activity state will be parcelled retained Fragments will be destroyed, and
+ * thus retained objects will also be destroyed.
+ *
+ * Typical usecase should be the following:
+ *
+ * <pre>
+ *     {@code
+ *
+ *     @Override
+ *     public void onCreate(Bundle savedInstanceState) {
+ *         super.onCreate(savedInstanceState);
+ *         BeRetained.onCreate(this);
+ *         BeRetained.restore(this);
+ *
+ *         //check if you have all necessary objects after restoration, if not - recreate them from scratch
+ *             ...
+ *         }
+ *     }
+ *
+ *     @Override
+ *     public void onSaveInstanceState(Bundle outState) {
+ *         super.onSaveInstanceState(outState);
+ *         BeRetained.save(this);
+ *     }
+ *
+ *     }
+ * </pre>
+ */
 public final class BeRetained {
+
+    private final static String JAVA_PACKAGE = "java";
+    private final static String ANDROID_PACKAGE = "android";
 
     /**
      * Suffix for classes which will contain static methods to trigger saving/restoring.
@@ -37,19 +74,40 @@ public final class BeRetained {
 
     private BeRetained() {}
 
+    /**
+     * Determines if this activity already has retained fragment that stores instances attached, and if no, attaches it.
+     * Call this method as early as possible.
+     *
+     * Take note that this method also calls executePendingTransactions(), and that's why it's better to perform
+     * all fragment manipulations after this method have been called.
+     * @param activity Activity that will have it's assigned retained fragment attached to it.
+     */
     public static void onCreate(FragmentActivity activity) {
         FieldsRetainer<FragmentActivity> retainer = findFieldsRetainer(activity.getClass());
-        retainer.onCreate(activity);
+        if(retainer != null) {
+            retainer.onCreate(activity);
+        }
     }
 
+    /**
+     * Saves instances of objects for fields marked with @Retain.
+     * @param source Activity that wants to save it's fields.
+     * @throws NullPointerException Will throw NullPointerException if field marked with @NonNull and @Retain was null during this call.
+     */
     public static void save(FragmentActivity source) {
         FieldsRetainer<FragmentActivity> retainer = findFieldsRetainer(source.getClass());
-        retainer.save(source);
+        if(retainer != null) {
+            retainer.save(source);
+        }
     }
 
     public static boolean restore(FragmentActivity target) {
         FieldsRetainer<FragmentActivity> retainer = findFieldsRetainer(target.getClass());
-        return retainer.restore(target);
+        if(retainer != null) {
+            return retainer.restore(target);
+        } else {
+            return false;
+        }
     }
 
     private static FieldsRetainer<FragmentActivity> findFieldsRetainer(Class<? extends FragmentActivity> clazz) {
@@ -57,10 +115,21 @@ public final class BeRetained {
 
         if(retainer == null) {
             try {
-                Class<?> retainerClass = Class.forName(FIELDS_RETAINER_PACKAGE + "." + clazz.getSimpleName() + FIELDS_RETAINER_SUFFIX);
-                retainer = (FieldsRetainer<FragmentActivity>) retainerClass.getDeclaredConstructor().newInstance();
-            } catch (ClassNotFoundException e) {
-                return null;
+                Class<?> retainEnabledClass = clazz;
+                Class<?> retainerClass = getRetainerClass(retainEnabledClass);
+                //while we can't find the retainer class and while we haven't reached root
+                while (retainerClass == null && retainEnabledClass != null) {
+                    retainEnabledClass = getParentClass(retainEnabledClass);
+                    if(retainEnabledClass != null) {
+                        retainerClass = getRetainerClass(retainEnabledClass);
+                    }
+                }
+
+                if(retainerClass != null) {
+                    retainer = (FieldsRetainer<FragmentActivity>) retainerClass.getDeclaredConstructor().newInstance();
+                } else {
+                    return null;
+                }
             } catch (NoSuchMethodException e) {
                 return null;
             } catch (InstantiationException e) {
@@ -72,6 +141,27 @@ public final class BeRetained {
             }
         }
 
+        if(retainer != null) {
+            FIELDS_RETAINER_MAP.put(clazz, retainer);
+        }
+
         return retainer;
+    }
+
+    private static Class<?> getParentClass(Class<?> clazz) {
+        if(clazz.getName().startsWith(ANDROID_PACKAGE) || clazz.getName().startsWith(JAVA_PACKAGE)) {
+            //we climbed up to root objects, let's stop it here
+            return null;
+        }
+
+        return clazz.getSuperclass();
+    }
+
+    private static Class<?> getRetainerClass(Class<?> clazz) {
+        try {
+            return Class.forName(FIELDS_RETAINER_PACKAGE + "." + clazz.getSimpleName() + FIELDS_RETAINER_SUFFIX);
+        } catch (ClassNotFoundException e) {
+            return null;
+        }
     }
 }
