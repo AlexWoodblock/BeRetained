@@ -1,5 +1,6 @@
 package com.woodblockwithoutco.beretained;
 
+import android.content.Intent;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,7 +18,7 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity {
 
     @Retain
-    int[] mIntArray; //this should issue a warning
+    int[] mIntArray;
 
     @Retain
     Object mObject;
@@ -60,13 +61,15 @@ public class MainActivity extends AppCompatActivity {
 
     protected CharSequence[] getItems() {
         String[] fieldNames = new String[] {
-                "mIntArray", "mObject", "mMap"
+                "mIntArray",
+                "mObject",
+                "mMap",
         };
 
-        int[] fieldHashcodes = new int[] {
-                System.identityHashCode(mIntArray),
-                System.identityHashCode(mObject),
-                System.identityHashCode(mMap),
+        String[] fieldHashcodes = new String[] {
+                "0x" + Integer.toHexString(System.identityHashCode(mIntArray)),
+                "0x" + Integer.toHexString(System.identityHashCode(mObject)),
+                "0x" + Integer.toHexString(System.identityHashCode(mMap))
         };
 
         if(fieldHashcodes.length != fieldNames.length) {
@@ -79,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
             SpannableStringBuilder description = new SpannableStringBuilder();
             description.append(fieldNames[i]);
             description.setSpan(new TypefaceSpan("bold"), 0, description.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            description.append(" 0x").append(Integer.toHexString(fieldHashcodes[i]));
+            description.append(" ").append(fieldHashcodes[i]);
             items[i] = description;
         }
 
