@@ -105,6 +105,14 @@ abstract class SaveRestoreClassBuilder implements ClassBuilder {
      */
     protected abstract CodeBlock getRestoreMethodCode(String targetArgName);
 
+    /**
+     * Returns target package for generated class.
+     * @return Target package for generated class.
+     */
+    protected String getTargetPackage() {
+        return enclosingClass.packageName();
+    }
+
     protected MethodSpec.Builder getRestoreMethodSkeleton() {
         ParameterSpec parameterSpecTarget = ParameterSpec.builder(enclosingClass, TARGET_ARG_NAME).build();
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder("restore").
@@ -125,7 +133,7 @@ abstract class SaveRestoreClassBuilder implements ClassBuilder {
 
     @Override
     public JavaFile build() {
-        JavaFile.Builder builder = JavaFile.builder(enclosingClass.packageName(), saveRestoreClassBuilder.build());
+        JavaFile.Builder builder = JavaFile.builder(getTargetPackage(), saveRestoreClassBuilder.build());
         return builder.build();
     }
 }

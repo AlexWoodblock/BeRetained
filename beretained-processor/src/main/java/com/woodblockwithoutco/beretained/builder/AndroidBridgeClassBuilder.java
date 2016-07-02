@@ -22,6 +22,7 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
+import com.squareup.javapoet.ParameterizedTypeName;
 import com.woodblockwithoutco.beretained.android.AndroidClasses;
 import com.woodblockwithoutco.beretained.android.Suffixes;
 
@@ -35,6 +36,8 @@ import javax.lang.model.type.TypeMirror;
  */
 public class AndroidBridgeClassBuilder extends SaveRestoreClassBuilder {
 
+    private static final String TARGET_PKG = "com.woodblockwithoutco.beretained";
+
     private String fragmentManagerTag; //tag for retained fragment
     private ClassName beRetainedFragmentClass; //storing retained fragment class for JavaPoet usage
 
@@ -45,6 +48,8 @@ public class AndroidBridgeClassBuilder extends SaveRestoreClassBuilder {
             fragmentManagerTag = enclosingClass.simpleName() + "_BeRetainedFragment";
 
             beRetainedFragmentClass = ClassName.get(enclosingClass.packageName(), enclosingClass.simpleName() + Suffixes.BERETAINED_FRAGMENT_SUFFIX);
+            saveRestoreClassBuilder.addSuperinterface(ParameterizedTypeName.get(AndroidClasses.COM_WOODBLOCKWITHOUTCO_BERETAINED_FIELDS_RETAINER, enclosingClass));
+            saveRestoreClassBuilder.addModifiers(Modifier.PUBLIC);
         }
     }
 
@@ -56,7 +61,6 @@ public class AndroidBridgeClassBuilder extends SaveRestoreClassBuilder {
     @Override
     protected CodeBlock getSaveMethodCode(String sourceArgName) {
         //finding fragment, if it's null - throwing exception, if it's there - put instances into it
-        //TODO: generate JavaDoc for the method
         CodeBlock.Builder saveCode = CodeBlock.builder().
                 addStatement("$T fm = $L.getSupportFragmentManager()", AndroidClasses.ANDROID_SUPPORT_V4_APP_FRAGMENT_MANAGER_CLASS, sourceArgName).
                 addStatement("$T fragment = ($T) fm.findFragmentByTag($S)", beRetainedFragmentClass, beRetainedFragmentClass, fragmentManagerTag).
@@ -72,7 +76,6 @@ public class AndroidBridgeClassBuilder extends SaveRestoreClassBuilder {
     protected CodeBlock getRestoreMethodCode(String targetArgName) {
         //finding fragment, if it's not there - adding it to FragmentManager,
         //and after all try to restore instances from it.
-        //TODO: generate JavaDoc for the method
         CodeBlock.Builder restoreCode = CodeBlock.builder().
                 addStatement("$T fm = $L.getSupportFragmentManager()", AndroidClasses.ANDROID_SUPPORT_V4_APP_FRAGMENT_MANAGER_CLASS, targetArgName).
                 addStatement("$T fragment = ($T) fm.findFragmentByTag($S)", beRetainedFragmentClass, beRetainedFragmentClass, fragmentManagerTag).
@@ -88,10 +91,9 @@ public class AndroidBridgeClassBuilder extends SaveRestoreClassBuilder {
     public void addBody() {
         super.addBody();
 
-        //adding private constructor because we don't want to create instances of this class
+        //adding package-level constructor
         MethodSpec privateConstructor = MethodSpec.
                 constructorBuilder().
-                addModifiers(Modifier.PRIVATE).
                 build();
 
         saveRestoreClassBuilder.addMethod(privateConstructor);
@@ -112,7 +114,8 @@ public class AndroidBridgeClassBuilder extends SaveRestoreClassBuilder {
                 methodBuilder("onCreate").
                 addParameter(activityParameter.build()).
                 addCode(onCreateCode.build()).
-                addModifiers(Modifier.PUBLIC, Modifier.STATIC).
+                addModifiers(Modifier.PUBLIC).
+                addAnnotation(Override.class).
                 build();
 
         saveRestoreClassBuilder.addMethod(onCreateMethod);
@@ -122,7 +125,7 @@ public class AndroidBridgeClassBuilder extends SaveRestoreClassBuilder {
     protected MethodSpec.Builder getSaveMethodSkeleton() {
         //adding static modifier for easier usage
         MethodSpec.Builder saveMethodSkeleton = super.getSaveMethodSkeleton();
-        saveMethodSkeleton.addModifiers(Modifier.STATIC);
+        saveMethodSkeleton.addAnnotation(Override.class);
         return saveMethodSkeleton;
     }
 
@@ -130,7 +133,12 @@ public class AndroidBridgeClassBuilder extends SaveRestoreClassBuilder {
     protected MethodSpec.Builder getRestoreMethodSkeleton() {
         //adding static modifier for easier usage
         MethodSpec.Builder restoreMethodSkeleton = super.getRestoreMethodSkeleton();
-        restoreMethodSkeleton.addModifiers(Modifier.STATIC);
+        restoreMethodSkeleton.addAnnotation(Override.class);
         return restoreMethodSkeleton;
+    }
+
+    @Override
+    protected String getTargetPackage() {
+        return TARGET_PKG;
     }
 }
