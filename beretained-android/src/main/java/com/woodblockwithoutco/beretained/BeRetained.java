@@ -101,6 +101,12 @@ public final class BeRetained {
         }
     }
 
+    /**
+     * Restores instances to fields marked with @Retain. Will not do anything if BeRetained.save() was not called before.
+     * @param target Activity to restore instances to.
+     * @return true if there are instances to restore, false otherwise.
+     * @throws NullPointerException Will throw NullPointerException if saved instance for field marked with @NonNull and @Retain was null during this call.
+     */
     public static boolean restore(FragmentActivity target) {
         FieldsRetainer<FragmentActivity> retainer = findFieldsRetainer(target.getClass());
         if(retainer != null) {
