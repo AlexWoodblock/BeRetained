@@ -16,7 +16,7 @@
     specific language governing permissions and limitations
     under the License.
  */
-package com.woodblockwithoutco.beretained.widget;
+package com.woodblockwithoutco.beretainedexample.widget;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -28,7 +28,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.woodblockwithoutco.beretained.R;
+import com.woodblockwithoutco.beretainedexample.R;
 
 /**
  * Simple Fragment that contains RecyclerView with simple TextView items with data

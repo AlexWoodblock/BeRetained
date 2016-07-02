@@ -16,7 +16,7 @@
     specific language governing permissions and limitations
     under the License.
  */
-package com.woodblockwithoutco.beretained;
+package com.woodblockwithoutco.beretainedexample;
 
 import android.support.annotation.NonNull;
 import android.text.SpannableStringBuilder;
@@ -37,21 +37,6 @@ public class SubMainActivity extends MainActivity {
     @Retain
     @NonNull
     LinkedList<String> mStringLinkedList;
-
-    @Override
-    protected boolean restoreState() {
-        return SubMainActivityFieldsRetainer.restore(this);
-    }
-
-    @Override
-    protected void saveState() {
-        SubMainActivityFieldsRetainer.save(this);
-    }
-
-    @Override
-    protected void fieldsRetainerOnCreate() {
-        SubMainActivityFieldsRetainer.onCreate(this);
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

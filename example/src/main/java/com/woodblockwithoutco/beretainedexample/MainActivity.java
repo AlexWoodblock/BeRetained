@@ -16,7 +16,7 @@
     specific language governing permissions and limitations
     under the License.
  */
-package com.woodblockwithoutco.beretained;
+package com.woodblockwithoutco.beretainedexample;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -31,7 +31,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.woodblockwithouco.beretained.Retain;
-import com.woodblockwithoutco.beretained.widget.RecyclerViewFragment;
+import com.woodblockwithoutco.beretained.BeRetained;
+import com.woodblockwithoutco.beretainedexample.widget.RecyclerViewFragment;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -56,10 +57,10 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //we must always call <ActivityName>FieldsRetainer.onCreate()
-        fieldsRetainerOnCreate();
+        //we must always call BeRetained.onCreate()
+        BeRetained.onCreate(this);
 
-        boolean wasRestored = restoreState();
+        boolean wasRestored = BeRetained.restore(this);
         if(wasRestored) {
             setTitle(R.string.retained);
         } else {
@@ -81,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        saveState();
+        BeRetained.save(this);
     }
 
     @Override
@@ -139,18 +140,6 @@ public class MainActivity extends AppCompatActivity {
         mMap.put("testkey1", "testvalue1");
         mMap.put("testkey2", "testvalue2");
         mMap.put("testkey3", "testvalue3");
-    }
-
-    protected boolean restoreState() {
-        return MainActivityFieldsRetainer.restore(this);
-    }
-
-    protected void saveState() {
-        MainActivityFieldsRetainer.save(this);
-    }
-
-    protected void fieldsRetainerOnCreate() {
-        MainActivityFieldsRetainer.onCreate(this);
     }
 
 }
