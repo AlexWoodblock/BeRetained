@@ -18,11 +18,20 @@
  */
 package com.woodblockwithoutco.beretained.android;
 
+/**
+ * Class that keeps suffixes for generated classes.
+ */
 public final class Suffixes {
 
     private Suffixes() {}
 
-    public static final String SAVE_RESTORE_CALLER_SUFFIX = "$$SaveRestoreCaller";
+    /**
+     * Suffix for support Fragments which will keep the objects alive.
+     */
     public static final String BERETAINED_FRAGMENT_SUFFIX = "$$BeRetainedFragment";
+
+    /**
+     * Suffix for classes which will contain static methods to trigger saving/restoring.
+     */
     public static final String FIELDS_RETAINER_SUFFIX = "FieldsRetainer";
 }

@@ -32,14 +32,17 @@ import javax.lang.model.type.TypeMirror;
 
 import static javax.tools.Diagnostic.Kind.ERROR;
 
+/**
+ * Base class for building classes that will contain save()/restore() method pair.
+ */
 abstract class SaveRestoreClassBuilder implements ClassBuilder {
 
-    private final static String TARGET_ARG_NAME = "target";
-    private final static String SOURCE_ARG_NAME = "source";
+    private final static String TARGET_ARG_NAME = "target"; //parameter name for restore() method
+    private final static String SOURCE_ARG_NAME = "source"; //parameter name for save() method
 
     protected Messager messager;
 
-    protected ClassName enclosingClass;
+    protected ClassName enclosingClass; //class that contains retained fields
 
     protected TypeSpec.Builder saveRestoreClassBuilder;
 
@@ -82,8 +85,24 @@ abstract class SaveRestoreClassBuilder implements ClassBuilder {
         saveRestoreClassBuilder.addMethod(restoreMethodBuilder.build());
     }
 
+    /**
+     * Returns suffix for class name that will be generated. Must reflect purpose of generated class.
+     * @return Suffix for generated class name.
+     */
     protected abstract String getSuffix();
+
+    /**
+     * Returns code that will be run on save() method invocation.
+     * @param sourceArgName Name of parameter that will be passed to save() method.
+     * @return Code for save() method.
+     */
     protected abstract CodeBlock getSaveMethodCode(String sourceArgName);
+
+    /**
+     * Returns code that will be run on save() method invocation.
+     * @param targetArgName Name of parameter that will be passed to restore() method.
+     * @return Code for restore() method.
+     */
     protected abstract CodeBlock getRestoreMethodCode(String targetArgName);
 
     protected MethodSpec.Builder getRestoreMethodSkeleton() {

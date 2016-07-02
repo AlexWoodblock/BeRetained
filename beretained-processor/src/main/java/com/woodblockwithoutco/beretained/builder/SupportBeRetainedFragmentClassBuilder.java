@@ -26,7 +26,7 @@ import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeName;
 import com.woodblockwithoutco.beretained.android.AndroidClasses;
 import com.woodblockwithoutco.beretained.android.Suffixes;
-import com.woodblockwithoutco.beretained.info.FieldDescription;
+import com.woodblockwithoutco.beretained.info.RetainedFieldDescription;
 
 import java.util.Collection;
 import java.util.List;
@@ -38,11 +38,16 @@ import javax.lang.model.util.Types;
 
 import static javax.tools.Diagnostic.Kind.ERROR;
 
-public class SupportBeRetainedFragmentClassBuilder extends SuperClassAwareSaveRestoreClassBuilder {
+/**
+ * Class builder for retained Fragments that will hold objects.
+ */
+public class SupportBeRetainedFragmentClassBuilder extends SuperBeRetainedFragmentAwareSaveRestoreClassBuilder {
 
+    //name for flag that will have true set to it if save() was called on Fragment instance
+    //it's needed to let the user know about whether the restore was successful(we had the instances) or not(we didn't have the instances)
     private final static String WAS_SAVED_FIELD_NAME = "wasSaved";
 
-    private List<FieldDescription> fields;
+    private List<RetainedFieldDescription> fields;
 
     public SupportBeRetainedFragmentClassBuilder(TypeMirror enclosingClassType, Messager m, Collection<TypeMirror> superRetainEnabledTypes, Types typeUtils) {
         super(enclosingClassType, m, superRetainEnabledTypes, typeUtils);
@@ -55,6 +60,8 @@ public class SupportBeRetainedFragmentClassBuilder extends SuperClassAwareSaveRe
 
     @Override
     protected TypeName getSuperTypeName() {
+        //if we found super Fragment(when one Activity inherits from another), return it,
+        //otherwise inherit from support Fragment
         if(closestSuperBeRetainedFragment != null) {
             return closestSuperBeRetainedFragment;
         } else {
@@ -70,14 +77,16 @@ public class SupportBeRetainedFragmentClassBuilder extends SuperClassAwareSaveRe
         }
 
         CodeBlock.Builder builder = CodeBlock.builder();
+        //if there's superclass - save flag will be set by it, otherwise set it ourselves
         if(closestSuperBeRetainedFragment != null) {
             builder.addStatement("super.save($L)", sourceArgName);
         } else {
             builder.addStatement("$L = true", WAS_SAVED_FIELD_NAME);
         }
 
-        for(FieldDescription field : fields) {
+        for(RetainedFieldDescription field : fields) {
             if(!field.nullAllowed) {
+                //adding null check that will throw NPE in case we're trying to save null value if null is not allowed
                 builder.beginControlFlow("if($L.$L == null)", sourceArgName, field.name);
                 builder.addStatement("throw new $T($S)",
                         ClassName.get(NullPointerException.class),
@@ -85,6 +94,7 @@ public class SupportBeRetainedFragmentClassBuilder extends SuperClassAwareSaveRe
                 builder.endControlFlow();
             }
 
+            //saving instance
             builder.addStatement("$L = $L.$L", field.name, sourceArgName, field.name);
         }
         return builder.build();
@@ -100,23 +110,31 @@ public class SupportBeRetainedFragmentClassBuilder extends SuperClassAwareSaveRe
         CodeBlock.Builder builder = CodeBlock.builder();
 
         if(closestSuperBeRetainedFragment != null) {
+            //if there's super Fragment - take restoration status from it
             builder.addStatement("$T restored = super.restore($L)", TypeName.BOOLEAN, targetArgName);
         }
 
+        //if there's super Fragment, then we have boolean variable called "restored",
+        //otherwise we check mWasSaved field
         String restoreStateFieldName = closestSuperBeRetainedFragment != null ? "restored" : WAS_SAVED_FIELD_NAME;
         builder.beginControlFlow("if($L)", restoreStateFieldName);
-        for(FieldDescription field : fields) {
+        for(RetainedFieldDescription field : fields) {
             if(!field.nullAllowed) {
+                //adding null check that will throw NPE in case we're trying to restore null value if null is not allowed
                 builder.beginControlFlow("if($L == null)", field.name);
                 builder.addStatement("throw new $T($S)",
                         ClassName.get(NullPointerException.class),
                         "Trying to restore restore null value to @NonNull field " + field.name);
                 builder.endControlFlow();
             }
+
+            //restoring instance
             builder.addStatement("$L.$L = $L", targetArgName, field.name, field.name);
         }
+
         builder.endControlFlow();
 
+        //returning restoration status
         builder.addStatement("return $L", restoreStateFieldName);
 
         return builder.build();
@@ -130,11 +148,15 @@ public class SupportBeRetainedFragmentClassBuilder extends SuperClassAwareSaveRe
         }
 
         super.addBody();
-        for(FieldDescription field : fields) {
-            FieldSpec.Builder fieldSpecBuilder = FieldSpec.builder(field.typeName, field.name, Modifier.PROTECTED);
+
+        //adding fields that will keep the instances
+        //TODO: maybe change modifier to private?
+        for(RetainedFieldDescription field : fields) {
+            FieldSpec.Builder fieldSpecBuilder = FieldSpec.builder(TypeName.get(field.type), field.name, Modifier.PROTECTED);
             saveRestoreClassBuilder.addField(fieldSpecBuilder.build());
         }
 
+        //if there's no super Fragment - create mWasSaved field and onCreate method
         if(closestSuperBeRetainedFragment == null) {
             FieldSpec.Builder wasSavedFieldBuilder = FieldSpec.builder(TypeName.BOOLEAN, WAS_SAVED_FIELD_NAME, Modifier.PRIVATE);
             saveRestoreClassBuilder.addField(wasSavedFieldBuilder.build());
@@ -148,6 +170,8 @@ public class SupportBeRetainedFragmentClassBuilder extends SuperClassAwareSaveRe
             onCreateMethod.addAnnotation(Override.class);
             onCreateMethod.addModifiers(Modifier.PUBLIC);
 
+            //adding setRetainInstance(true) to onCreate body() - this is crucial
+            //because otherwise fragment will be destroyed
             CodeBlock.Builder onCreateCode = CodeBlock.builder();
             onCreateCode.addStatement("super.onCreate($L)", icicleName);
             onCreateCode.addStatement("setRetainInstance(true)");
@@ -157,7 +181,7 @@ public class SupportBeRetainedFragmentClassBuilder extends SuperClassAwareSaveRe
         }
     }
 
-    public void setFields(List<FieldDescription> fieldList) {
+    public void setFields(List<RetainedFieldDescription> fieldList) {
         fields = fieldList;
     }
 }

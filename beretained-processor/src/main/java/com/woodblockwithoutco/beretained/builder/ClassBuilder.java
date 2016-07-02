@@ -20,7 +20,11 @@ package com.woodblockwithoutco.beretained.builder;
 
 import com.squareup.javapoet.JavaFile;
 
-public interface ClassBuilder {
+/**
+ * Interface for generic class builder that have to add body after initialization
+ * and can save class to .java file.
+ */
+interface ClassBuilder {
     JavaFile build();
     void addBody();
 }

@@ -28,6 +28,10 @@ import com.woodblockwithouco.beretained.Retain;
 
 import java.util.LinkedList;
 
+/**
+ * Subclass of MainActivity demoing that inheritance automatically works provided
+ * you call generated save/restore methods for subclass.
+ */
 public class SubMainActivity extends MainActivity {
 
     @Retain
@@ -46,6 +50,7 @@ public class SubMainActivity extends MainActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        //no menu needed
         return false;
     }
 

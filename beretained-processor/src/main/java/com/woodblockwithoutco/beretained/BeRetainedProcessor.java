@@ -25,7 +25,7 @@ import com.woodblockwithouco.beretained.Retain;
 import com.woodblockwithoutco.beretained.android.AndroidClasses;
 import com.woodblockwithoutco.beretained.builder.AndroidBridgeClassBuilder;
 import com.woodblockwithoutco.beretained.builder.SupportBeRetainedFragmentClassBuilder;
-import com.woodblockwithoutco.beretained.info.FieldDescription;
+import com.woodblockwithoutco.beretained.info.RetainedFieldDescription;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -56,6 +56,9 @@ import javax.lang.model.util.Types;
 
 import static javax.tools.Diagnostic.Kind.ERROR;
 
+/**
+ * The annotation processor that handles @Retain annotations.
+ */
 @AutoService(Processor.class)
 public class BeRetainedProcessor extends AbstractProcessor {
 
@@ -88,29 +91,30 @@ public class BeRetainedProcessor extends AbstractProcessor {
         Set<? extends Element> allElements = roundEnv.getElementsAnnotatedWith(Retain.class);
         Set<VariableElement> retainedFields = ElementFilter.fieldsIn(allElements);
 
-        final Set<TypeMirror> retainEnabledClasses = new HashSet<>();
-        final Map<TypeName, TypeMirror> retainEnabledClassesMap = new HashMap<>();
-        final Map<TypeName, List<FieldDescription>> classFieldMap = new HashMap<>();
+        final Set<TypeMirror> retainEnabledClasses =
+                new HashSet<>(); //complete set of all retain-enabled classes
+        final Map<TypeMirror, List<RetainedFieldDescription>> classFieldMap =
+                new HashMap<>(); //retain-enabled-class -> list of retained fields
+
         for (VariableElement field : retainedFields) {
             TypeMirror fieldType = field.asType();
-            TypeName fieldClass = TypeName.get(fieldType);
             String fieldName = field.getSimpleName().toString();
 
             if (!validate(field)) {
+                //stop the processing if field is invalid
                 return true;
             }
 
-            TypeMirror enclosingClassType = field.getEnclosingElement().asType();
-            TypeName enclosingClass = TypeName.get(enclosingClassType);
-            retainEnabledClassesMap.put(enclosingClass, enclosingClassType);
+            TypeMirror enclosingClassType = field.getEnclosingElement().asType(); //type that contains retained fields
             retainEnabledClasses.add(enclosingClassType);
 
-            List<FieldDescription> fields = classFieldMap.get(enclosingClass);
+            List<RetainedFieldDescription> fields = classFieldMap.get(enclosingClassType);
             if (fields == null) {
                 fields = new ArrayList<>();
-                classFieldMap.put(enclosingClass, fields);
+                classFieldMap.put(enclosingClassType, fields);
             }
 
+            //checking for @NonNull annotations
             List<? extends AnnotationMirror> annotationMirrors = field.getAnnotationMirrors();
             boolean nullAllowed = true;
             for(AnnotationMirror annotationMirror : annotationMirrors) {
@@ -123,19 +127,23 @@ public class BeRetainedProcessor extends AbstractProcessor {
                 }
             }
 
-            fields.add(new FieldDescription(fieldClass, fieldName, nullAllowed));
+            fields.add(new RetainedFieldDescription(fieldType, fieldName, nullAllowed));
         }
 
-        for (TypeName clazz : classFieldMap.keySet()) {
-            TypeMirror enclosingType = retainEnabledClassesMap.get(clazz);
+        //now, after all the classes have been found, start actual code generation
+        for (TypeMirror enclosingType : classFieldMap.keySet()) {
+            //build the set that doesn't contain current type - it's used to search for inheritance
             Set<TypeMirror> retainEnabledClassesWithoutEnclosingType = new HashSet<>(retainEnabledClasses);
             retainEnabledClassesWithoutEnclosingType.remove(enclosingType);
-            writeBeRetainedClasses(classFieldMap.get(clazz), enclosingType, retainEnabledClassesWithoutEnclosingType);
+            writeBeRetainedClasses(classFieldMap.get(enclosingType),
+                    enclosingType,
+                    retainEnabledClassesWithoutEnclosingType);
         }
 
         return true;
     }
 
+    //validate field - it should not be final or private
     private boolean validate(VariableElement element) {
         //must be package-accessible, protected or public
         if (element.getModifiers().contains(Modifier.PRIVATE)) {
@@ -158,14 +166,16 @@ public class BeRetainedProcessor extends AbstractProcessor {
             return false;
         }
 
+        //this is something I can't imagine happening - fields that are not in the class - but let's check it,
+        //just to be sure
         Element enclosingClass = element.getEnclosingElement();
         TypeElement typeElement = elements.getTypeElement(enclosingClass.asType().toString());
         if(typeElement == null) {
-            messager.printMessage(ERROR, "Enclosing type must be a class!", element);
+            messager.printMessage(ERROR, "Enclosing type must be a class, but it's a " + enclosingClass.asType().toString(), element);
             return false;
         }
 
-
+        //check if fields marked with @Retain are in FragmentActivity
         boolean enclosedInFragmentActivity = validateIsEnclosedInFragmentActivity(enclosingClass.asType());
 
         if(!enclosedInFragmentActivity) {
@@ -180,6 +190,7 @@ public class BeRetainedProcessor extends AbstractProcessor {
         return true;
     }
 
+    //check if class containing @Retain fields is FragmentActivity or it's subclasses
     private boolean validateIsEnclosedInFragmentActivity(TypeMirror enclosingType) {
         if(AndroidClasses.ANDROID_SUPPORT_V4_APP_FRAGMENT_ACTIVITY_CLASS_NAME.equals(enclosingType.toString())) {
             return true;
@@ -196,7 +207,7 @@ public class BeRetainedProcessor extends AbstractProcessor {
         return false;
     }
 
-    private void writeBeRetainedClasses(List<FieldDescription> fields,
+    private void writeBeRetainedClasses(List<RetainedFieldDescription> fields,
                                         TypeMirror enclosingClass,
                                         Collection<TypeMirror> retainEnabledClasses) {
 
@@ -207,6 +218,7 @@ public class BeRetainedProcessor extends AbstractProcessor {
                 types
         );
 
+        //these calls must be in this exact order, otherwise addBody() won't have any fields to add
         beRetainedFragmentBuilder.setFields(fields);
         beRetainedFragmentBuilder.addBody();
 

@@ -27,14 +27,18 @@ import javax.annotation.processing.Messager;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 
-abstract class SuperClassAwareSaveRestoreClassBuilder extends SaveRestoreClassBuilder {
+/**
+ * Base class for building classes that will contain save()/restore() method pair that have to be
+ * aware of Fragment superclass.
+ */
+abstract class SuperBeRetainedFragmentAwareSaveRestoreClassBuilder extends SaveRestoreClassBuilder {
 
     protected TypeName closestSuperBeRetainedFragment;
 
-    public SuperClassAwareSaveRestoreClassBuilder(TypeMirror enclosingClassType,
-                                                  Messager m,
-                                                  Collection<TypeMirror> superRetainEnabledTypes,
-                                                  Types typeUtils) {
+    public SuperBeRetainedFragmentAwareSaveRestoreClassBuilder(TypeMirror enclosingClassType,
+                                                               Messager m,
+                                                               Collection<TypeMirror> superRetainEnabledTypes,
+                                                               Types typeUtils) {
         super(enclosingClassType, m);
 
         closestSuperBeRetainedFragment = SuperBeRetainedFragmentTypeFinder.getSuperBeRetainedFragment(enclosingClassType,
@@ -42,11 +46,16 @@ abstract class SuperClassAwareSaveRestoreClassBuilder extends SaveRestoreClassBu
                 typeUtils,
                 m);
 
+        //if there's a superclass, add it as, well, a superclass
         TypeName superclass = getSuperTypeName();
         if(superclass != null) {
             saveRestoreClassBuilder.superclass(superclass);
         }
     }
 
+    /**
+     * Returns Fragment superclass TypeName for this Fragment..
+     * @return Fragment superclass TypeName.
+     */
     protected abstract TypeName getSuperTypeName();
 }

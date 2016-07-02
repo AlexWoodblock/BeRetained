@@ -20,13 +20,29 @@ package com.woodblockwithoutco.beretained.info;
 
 import com.squareup.javapoet.TypeName;
 
-public class FieldDescription {
-    public final TypeName typeName;
+import javax.lang.model.type.TypeMirror;
+
+/**
+ * Description of retained field.
+ */
+public class RetainedFieldDescription {
+    /**
+     * Field type
+     */
+    public final TypeMirror type;
+
+    /**
+     * Name of field.
+     */
     public final String name;
+
+    /**
+     * Allow null - if false, null check will be added.
+     */
     public final boolean nullAllowed;
 
-    public FieldDescription(TypeName typeName, String name, boolean nullAllowed) {
-        this.typeName = typeName;
+    public RetainedFieldDescription(TypeMirror type, String name, boolean nullAllowed) {
+        this.type = type;
         this.name = name;
         this.nullAllowed = nullAllowed;
     }

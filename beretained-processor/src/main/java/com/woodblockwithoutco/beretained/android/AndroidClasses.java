@@ -20,6 +20,10 @@ package com.woodblockwithoutco.beretained.android;
 
 import com.squareup.javapoet.ClassName;
 
+/**
+ * Stores ready-to-use references to classes and their names for JavaPoet and for other tasks,
+ * like checking if object inherits from specific class.
+ */
 public final class AndroidClasses {
 
     private AndroidClasses() {}

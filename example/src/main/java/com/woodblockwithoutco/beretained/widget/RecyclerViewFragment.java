@@ -31,7 +31,8 @@ import android.widget.TextView;
 import com.woodblockwithoutco.beretained.R;
 
 /**
- * Created by aleksandr on 7/1/16.
+ * Simple Fragment that contains RecyclerView with simple TextView items with data
+ * from CharSequence array.
  */
 public class RecyclerViewFragment extends Fragment {
 
