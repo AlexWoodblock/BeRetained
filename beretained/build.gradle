@@ -7,8 +7,8 @@ group = project.libGroup
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.2"
-    resourcePrefix "wooodblock_beretained__"
+    buildToolsVersion '23.0.2'
+    resourcePrefix 'wooodblock_beretained__'
 
     defaultConfig {
         minSdkVersion 4
@@ -31,7 +31,9 @@ install {
             project {
                 packaging 'aar'
 
-                name 'Simple library to help retaining non-Parcelable objects during Activity configuration change'
+                name 'beretained'
+                description 'BeRetained is a simple library that will handle non-parcelable instances saving for configuration changes.'
+
                 url project.siteUrl
 
                 // Set your license
@@ -41,6 +43,7 @@ install {
                         url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
                     }
                 }
+
                 developers {
                     developer {
                         id 'DrBreen'
@@ -48,6 +51,7 @@ install {
                         email 'wryyy906@gmail.com'
                     }
                 }
+
                 scm {
                     connection project.gitUrl
                     developerConnection project.gitUrl
@@ -60,13 +64,13 @@ install {
 }
 
 tasks.withType(JavaCompile) {
-    options.encoding = "UTF-8"
+    options.encoding = 'UTF-8'
 }
 
 task androidJavadocs(type: Javadoc) {
     source = android.sourceSets.main.java.srcDirs
     classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-    classpath += fileTree(dir: "$buildDir/intermediates/exploded-aar/", include:"**/classes.jar")
+    classpath += fileTree(dir: '$buildDir/intermediates/exploded-aar/', include:'**/classes.jar')
 }
 
 task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
@@ -88,30 +92,33 @@ Properties properties = new Properties()
 properties.load(project.rootProject.file('bintray.properties').newDataInputStream())
 
 bintray {
-    user = properties.getProperty("bintray.user")
-    key = properties.getProperty("bintray.apikey")
+    user = properties.getProperty('bintray.user')
+    key = properties.getProperty('bintray.apikey')
 
     configurations = ['archives']
 
     publish = true
-    override = true
 
     pkg {
-        repo = "maven"
+        repo = 'maven'
         publicDownloadNumbers = true
 
-        name = "BeRetained"
-        desc = "BeRetained is a simple library that will handle non-parcelable instances saving for configuration changes."
+        name = 'BeRetained'
+        desc = 'BeRetained is a simple library that will handle non-parcelable instances saving for configuration changes.'
 
         websiteUrl = siteUrl
         vcsUrl = gitUrl
         issueTrackerUrl = gitIssueTrackerUrl
 
-        labels = ["android", "retained fragment", "configuration change"]
+        labels = ['android', 'retained fragment', 'configuration change']
 
-        licenses = ["Apache-2.0"]
+        licenses = ['Apache-2.0']
 
-        githubRepo = "DrBreen/BeRetained"
-        githubReleaseNotesFile = "README.md"
+        githubRepo = 'DrBreen/BeRetained'
+        githubReleaseNotesFile = 'README.md'
+
+        version {
+            name = project.libVersion
+        }
     }
 }

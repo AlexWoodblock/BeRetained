@@ -14,13 +14,13 @@ buildscript {
 
 
 project.ext {
-    siteUrl = "https://github.com/DrBreen/BeRetained"
-    gitUrl = "https://github.com/DrBreen/BeRetained.git"
-    gitIssueTrackerUrl = "https://github.com/DrBreen/BeRetained/issues"
+    siteUrl = 'https://github.com/DrBreen/BeRetained'
+    gitUrl = 'https://github.com/DrBreen/BeRetained.git'
+    gitIssueTrackerUrl = 'https://github.com/DrBreen/BeRetained/issues'
 
-    libVersion = "0.1"
+    libVersion = '0.1'
     libBuildNumber = 2
-    libGroup = "com.woodblockwithoutco"
+    libGroup = 'com.woodblockwithoutco'
 }
 
 allprojects {
