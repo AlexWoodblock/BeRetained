@@ -20,7 +20,6 @@ package com.woodblockwithoutco.beretained;
 
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.JavaFile;
-import com.squareup.javapoet.TypeName;
 import com.woodblockwithouco.beretained.Retain;
 import com.woodblockwithoutco.beretained.android.AndroidClasses;
 import com.woodblockwithoutco.beretained.builder.AndroidBridgeClassBuilder;
