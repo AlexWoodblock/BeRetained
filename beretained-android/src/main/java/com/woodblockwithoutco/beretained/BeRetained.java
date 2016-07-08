@@ -38,7 +38,7 @@ import java.util.Map;
  * <pre>
  *     {@code
  *
- *     @Override
+ *     &#064;Override
  *     public void onCreate(Bundle savedInstanceState) {
  *         super.onCreate(savedInstanceState);
  *         BeRetained.onCreate(this);
@@ -47,9 +47,8 @@ import java.util.Map;
  *         //check if you have all necessary objects after restoration, if not - recreate them from scratch
  *             ...
  *         }
- *     }
  *
- *     @Override
+ *     &#064;Override
  *     public void onSaveInstanceState(Bundle outState) {
  *         super.onSaveInstanceState(outState);
  *         BeRetained.save(this);
