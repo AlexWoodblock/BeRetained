@@ -7,15 +7,20 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:2.1.2'
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
-
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.4'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.3'
     }
 }
 
+
 project.ext {
-    siteUrl = 'https://github.com/DrBreen/beretained'
-    gitUrl = 'https://github.com/DrBreen/beretained.git'
+    siteUrl = "https://github.com/DrBreen/BeRetained"
+    gitUrl = "https://github.com/DrBreen/BeRetained.git"
+    gitIssueTrackerUrl = "https://github.com/DrBreen/BeRetained/issues"
+
+    libVersion = "0.1"
+    libBuildNumber = 2
+    libGroup = "com.woodblockwithoutco"
 }
 
 allprojects {

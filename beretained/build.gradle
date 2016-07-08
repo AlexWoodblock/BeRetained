@@ -2,8 +2,8 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 
-version = "0.1"
-group = 'com.woodblockwithoutco'
+version = project.libVersion
+group = project.libGroup
 
 android {
     compileSdkVersion 23
@@ -82,4 +82,36 @@ task androidSourcesJar(type: Jar) {
 artifacts {
     archives androidSourcesJar
     archives androidJavadocsJar
+}
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('bintray.properties').newDataInputStream())
+
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+
+    configurations = ['archives']
+
+    publish = true
+    override = true
+
+    pkg {
+        repo = "maven"
+        publicDownloadNumbers = true
+
+        name = "BeRetained"
+        desc = "BeRetained is a simple library that will handle non-parcelable instances saving for configuration changes."
+
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        issueTrackerUrl = gitIssueTrackerUrl
+
+        labels = ["android", "retained fragment", "configuration change"]
+
+        licenses = ["Apache-2.0"]
+
+        githubRepo = "DrBreen/BeRetained"
+        githubReleaseNotesFile = "README.md"
+    }
 }
