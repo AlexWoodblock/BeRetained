@@ -103,7 +103,7 @@ bintray {
         repo = 'maven'
         publicDownloadNumbers = true
 
-        name = 'BeRetained'
+        name = 'com.woodblockwithoutco.beretained'
         desc = 'BeRetained is a simple library that will handle non-parcelable instances saving for configuration changes.'
 
         websiteUrl = siteUrl
