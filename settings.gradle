@@ -1,1 +1,1 @@
-include ':example', ':beretained-annotations', ':beretained-processor', ':beretained-android'
+include ':example', ':beretained-annotations', ':beretained-processor', ':beretained'
