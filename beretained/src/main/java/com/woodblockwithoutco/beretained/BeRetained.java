@@ -36,25 +36,25 @@ import java.util.Map;
  * Typical usecase should be the following:
  *
  * <pre>
- *     {@code
+ *     <code>
  *
- *     &#064;Override
+ *     &#64;Override
  *     public void onCreate(Bundle savedInstanceState) {
  *         super.onCreate(savedInstanceState);
  *         BeRetained.onCreate(this);
  *         BeRetained.restore(this);
  *
  *         //check if you have all necessary objects after restoration, if not - recreate them from scratch
- *             ...
- *         }
+ *         ...
+ *     }
  *
- *     &#064;Override
+ *     &#64;Override
  *     public void onSaveInstanceState(Bundle outState) {
  *         super.onSaveInstanceState(outState);
  *         BeRetained.save(this);
  *     }
  *
- *     }
+ *     </code>
  * </pre>
  */
 public final class BeRetained {
