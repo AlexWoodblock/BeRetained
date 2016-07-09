@@ -1,3 +1,5 @@
 apply plugin: 'java'
-sourceCompatibility = JavaVersion.VERSION_1_7
-targetCompatibility = JavaVersion.VERSION_1_7
+sourceCompatibility = project.sourceCompatibilityVersion
+targetCompatibility = project.targetCompatibilityVersion
+
+apply from: rootProject.file('gradle/upload.gradle')

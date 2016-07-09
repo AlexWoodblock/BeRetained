@@ -1,0 +1,129 @@
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+
+version = VERSION
+group = GROUP
+
+afterEvaluate { project ->
+
+    install {
+        repositories.mavenInstaller {
+            pom.project {
+                packaging PACKAGING
+
+                name POM_NAME
+                description DESCRIPTION
+
+                url SITE_URL
+
+                licenses {
+                    license {
+                        name LICENSE_NAME
+                        url LICENSE_URL
+                    }
+                }
+
+                developers {
+                    developer {
+                        id DEVELOPER_ID
+                        name DEVELOPER_NAME
+                        email DEVELOPER_EMAIL
+                    }
+                }
+
+                scm {
+                    connection GIT_URL
+                    developerConnection GIT_URL
+                    url SITE_URL
+                }
+            }
+        }
+    }
+
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+    }
+
+    if(project.getPlugins().hasPlugin("com.android.library")) {
+
+        task androidJavadocs(type: Javadoc) {
+            source = android.sourceSets.main.java.srcDirs
+            classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+        }
+
+        androidJavadocs.doFirst {
+            classpath += fileTree(dir: "$buildDir/intermediates/exploded-aar/", include:"**/classes.jar")
+        }
+
+        task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
+            classifier = 'javadoc'
+            from androidJavadocs.destinationDir
+        }
+
+        task androidSourcesJar(type: Jar) {
+            classifier = 'sources'
+            from android.sourceSets.main.java.srcDirs
+        }
+
+        artifacts {
+            archives androidSourcesJar
+            archives androidJavadocsJar
+        }
+    } else {
+        task javadocs(type: Javadoc) {
+            source = sourceSets.main.allJava
+            classpath += configurations.compile
+        }
+
+        task javadocsJar(type: Jar, dependsOn: javadocs) {
+            classifier = 'javadoc'
+            from javadocs.destinationDir
+        }
+
+        task sourcesJar(type: Jar) {
+            classifier = 'sources'
+            from sourceSets.main.allJava
+        }
+
+        artifacts {
+            archives javadocsJar
+            archives sourcesJar
+        }
+    }
+
+    Properties properties = new Properties()
+    properties.load(rootProject.file('bintray.properties').newDataInputStream())
+
+    bintray {
+        user = properties.getProperty('bintray.user')
+        key = properties.getProperty('bintray.apikey')
+
+        configurations = ['archives']
+
+        publish = true
+        override = true
+
+        pkg {
+            repo = REPO
+            publicDownloadNumbers = true
+
+            name = BINTRAY_NAME
+            desc = DESCRIPTION
+
+            websiteUrl = SITE_URL
+            vcsUrl = GIT_URL
+            issueTrackerUrl = ISSUE_TRACKER_URL
+
+            labels = ['android', 'retained fragment', 'configuration change', 'apt', 'annotation processing']
+
+            licenses = ['Apache-2.0']
+
+            githubRepo = GIT_REPO
+            githubReleaseNotesFile = GIT_RELEASE_NOTES
+
+            version {
+                name = VERSION
+            }
+        }
+    }
+}

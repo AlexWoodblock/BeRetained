@@ -10,29 +10,22 @@ buildscript {
     }
 }
 
-project.ext {
-    siteUrl = 'https://github.com/DrBreen/BeRetained'
-    gitUrl = 'https://github.com/DrBreen/BeRetained.git'
-    gitIssueTrackerUrl = 'https://github.com/DrBreen/BeRetained/issues'
-    gitRepo = 'DrBreen/BeRetained'
-    gitReleaseNotes = 'README.md'
-
-    libVersion = '0.1.1'
-    libVersionCode = 3
-    libGroup = 'com.woodblockwithoutco'
-
-    developerId = 'DrBreen'
-    developerName = 'Alexander Leontev'
-    developerEmail = 'wryyy906@gmail.com'
-
-    libLicenseName = 'The Apache Software License, Version 2.0'
-    libLicenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-}
-
 allprojects {
     repositories {
         jcenter()
     }
+}
+
+ext {
+    resourcePrefix = 'wooodblock_beretained__'
+
+    minSdkVersion = 4
+    targetSdkVersion = 23
+    compileSdkVersion = 23
+    buildToolsVersion = '24.0.0'
+    sourceCompatibilityVersion = JavaVersion.VERSION_1_7
+    targetCompatibilityVersion = JavaVersion.VERSION_1_7
+    versionName = VERSION
 }
 
 task clean(type: Delete) {
