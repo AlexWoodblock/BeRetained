@@ -1,3 +1,5 @@
+[ ![Download](https://api.bintray.com/packages/drbreen/maven/com.woodblockwithoutco.beretained-processor/images/download.svg) ](https://bintray.com/drbreen/maven/com.woodblockwithoutco.beretained-processor/_latestVersion)
+
 # BeRetained
 BeRetained is a simple library that will handle non-parcelable instances saving for configuration changes.
 
