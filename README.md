@@ -31,8 +31,6 @@ public class SampleActivity extends FragmentActivity {
 }
 ```
 
-**Please note:** during first run you will not have class SampleActivityFieldsRetainer. To get this file to be generated, you need to build your project once first. You also need to rebuild project every time you'll add new Activity with @Retain fields.
-
 If you have subclass of Activity that have @Retain fields in it, you don't need to anything extra - just subclass it:
 ```
 public class SampleActivity extends FragmentActivity {

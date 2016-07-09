@@ -31,7 +31,7 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.type.TypeMirror;
 
 /**
- * Class builder for <ActivityName>FieldsRetainer -
+ * Class builder for &lt;ActivityName&gt;FieldsRetainer -
  * classes that Activities will have to call in order to save/restore fields.
  */
 public class AndroidBridgeClassBuilder extends SaveRestoreClassBuilder {

@@ -18,8 +18,6 @@
  */
 package com.woodblockwithoutco.beretained.info;
 
-import com.squareup.javapoet.TypeName;
-
 import javax.lang.model.type.TypeMirror;
 
 /**

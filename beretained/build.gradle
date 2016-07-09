@@ -1,28 +1,36 @@
-apply plugin: 'java'
+apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
-
-sourceCompatibility = JavaVersion.VERSION_1_7
-targetCompatibility = JavaVersion.VERSION_1_7
 
 version = project.libVersion
 group = project.libGroup
 
+android {
+    compileSdkVersion 23
+    buildToolsVersion '23.0.2'
+    resourcePrefix 'wooodblock_beretained__'
+
+    defaultConfig {
+        minSdkVersion 4
+        targetSdkVersion 23
+        versionCode project.libVersionCode
+        versionName version
+    }
+
+    buildTypes {
+    }
+}
+
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-
     compile project(':beretained-annotations')
-    compile 'com.google.auto.service:auto-service:1.0-rc2'
-    compile 'com.squareup:javapoet:1.7.0'
-
-    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:support-v4:23.4.0'
 }
 
 install {
     repositories.mavenInstaller {
         pom {
             project {
-                packaging 'jar'
+                packaging 'aar'
 
                 name 'beretained'
                 description 'BeRetained is a simple library that will handle non-parcelable instances saving for configuration changes.'
@@ -58,24 +66,25 @@ tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
-task javadocs(type: Javadoc) {
-    source = sourceSets.main.allJava
-    classpath += configurations.compile
+task androidJavadocs(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    classpath += fileTree(dir: '$buildDir/intermediates/exploded-aar/', include:'**/classes.jar')
 }
 
-task javadocsJar(type: Jar, dependsOn: javadocs) {
+task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
     classifier = 'javadoc'
-    from javadocs.destinationDir
+    from androidJavadocs.destinationDir
 }
 
-task sourcesJar(type: Jar) {
+task androidSourcesJar(type: Jar) {
     classifier = 'sources'
-    from sourceSets.main.allJava
+    from android.sourceSets.main.java.srcDirs
 }
 
 artifacts {
-    archives javadocsJar
-    archives sourcesJar
+    archives androidSourcesJar
+    archives androidJavadocsJar
 }
 
 Properties properties = new Properties()
@@ -94,14 +103,14 @@ bintray {
         repo = 'maven'
         publicDownloadNumbers = true
 
-        name = 'com.woodblockwithoutco.beretained-processor'
-        desc = 'BeRetained Processor is used to generate classes that will automatically retain non-parcelable instances on Activity config change.'
+        name = 'com.woodblockwithoutco.beretained'
+        desc = 'BeRetained is a simple library that will handle non-parcelable instances saving for configuration changes.'
 
         websiteUrl = project.siteUrl
         vcsUrl = project.gitUrl
         issueTrackerUrl = project.gitIssueTrackerUrl
 
-        labels = ['android', 'retained fragment', 'configuration change', 'apt']
+        labels = ['android', 'retained fragment', 'configuration change']
 
         licenses = ['Apache-2.0']
 
