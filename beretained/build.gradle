@@ -13,7 +13,7 @@ android {
     defaultConfig {
         minSdkVersion 4
         targetSdkVersion 23
-        versionCode 1
+        versionCode project.libVersionCode
         versionName version
     }
 
@@ -22,6 +22,7 @@ android {
 }
 
 dependencies {
+    compile project(':beretained-annotations')
     compile 'com.android.support:support-v4:23.4.0'
 }
 
@@ -36,19 +37,18 @@ install {
 
                 url project.siteUrl
 
-                // Set your license
                 licenses {
                     license {
-                        name 'The Apache Software License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        name project.libLicenseName
+                        url project.libLicenseUrl
                     }
                 }
 
                 developers {
                     developer {
-                        id 'DrBreen'
-                        name 'Alexander Leontev'
-                        email 'wryyy906@gmail.com'
+                        id project.developerId
+                        name project.developerName
+                        email project.developerEmail
                     }
                 }
 
@@ -56,7 +56,6 @@ install {
                     connection project.gitUrl
                     developerConnection project.gitUrl
                     url project.siteUrl
-
                 }
             }
         }
@@ -98,6 +97,7 @@ bintray {
     configurations = ['archives']
 
     publish = true
+    override = true
 
     pkg {
         repo = 'maven'
@@ -106,16 +106,16 @@ bintray {
         name = 'com.woodblockwithoutco.beretained'
         desc = 'BeRetained is a simple library that will handle non-parcelable instances saving for configuration changes.'
 
-        websiteUrl = siteUrl
-        vcsUrl = gitUrl
-        issueTrackerUrl = gitIssueTrackerUrl
+        websiteUrl = project.siteUrl
+        vcsUrl = project.gitUrl
+        issueTrackerUrl = project.gitIssueTrackerUrl
 
         labels = ['android', 'retained fragment', 'configuration change']
 
         licenses = ['Apache-2.0']
 
-        githubRepo = 'DrBreen/BeRetained'
-        githubReleaseNotesFile = 'README.md'
+        githubRepo = project.gitRepo
+        githubReleaseNotesFile = project.gitReleaseNotes
 
         version {
             name = project.libVersion

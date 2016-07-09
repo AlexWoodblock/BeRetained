@@ -1,6 +1,12 @@
 apply plugin: 'java'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+
 sourceCompatibility = JavaVersion.VERSION_1_7
 targetCompatibility = JavaVersion.VERSION_1_7
+
+version = project.libVersion
+group = project.libGroup
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -10,4 +16,100 @@ dependencies {
     compile 'com.squareup:javapoet:1.7.0'
 
     testCompile 'junit:junit:4.12'
+}
+
+install {
+    repositories.mavenInstaller {
+        pom {
+            project {
+                packaging 'jar'
+
+                name 'beretained'
+                description 'BeRetained is a simple library that will handle non-parcelable instances saving for configuration changes.'
+
+                url project.siteUrl
+
+                licenses {
+                    license {
+                        name project.libLicenseName
+                        url project.libLicenseUrl
+                    }
+                }
+
+                developers {
+                    developer {
+                        id project.developerId
+                        name project.developerName
+                        email project.developerEmail
+                    }
+                }
+
+                scm {
+                    connection project.gitUrl
+                    developerConnection project.gitUrl
+                    url project.siteUrl
+                }
+            }
+        }
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+task javadocs(type: Javadoc) {
+    source = sourceSets.main.allJava
+    classpath += configurations.compile
+}
+
+task javadocsJar(type: Jar, dependsOn: javadocs) {
+    classifier = 'javadoc'
+    from javadocs.destinationDir
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allJava
+}
+
+artifacts {
+    archives javadocsJar
+    archives sourcesJar
+}
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('bintray.properties').newDataInputStream())
+
+bintray {
+    user = properties.getProperty('bintray.user')
+    key = properties.getProperty('bintray.apikey')
+
+    configurations = ['archives']
+
+    publish = true
+    override = true
+
+    pkg {
+        repo = 'maven'
+        publicDownloadNumbers = true
+
+        name = 'com.woodblockwithoutco.beretained-processor'
+        desc = 'BeRetained Processor is used to generate classes that will automatically retain non-parcelable instances on Activity config change.'
+
+        websiteUrl = project.siteUrl
+        vcsUrl = project.gitUrl
+        issueTrackerUrl = project.gitIssueTrackerUrl
+
+        labels = ['android', 'retained fragment', 'configuration change', 'apt']
+
+        licenses = ['Apache-2.0']
+
+        githubRepo = project.gitRepo
+        githubReleaseNotesFile = project.gitReleaseNotes
+
+        version {
+            name = project.libVersion
+        }
+    }
 }
