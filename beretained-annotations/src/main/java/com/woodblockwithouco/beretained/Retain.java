@@ -22,11 +22,11 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 
 /**
- * Fields of {@link android.support.v4.app.FragmentActivity} marked with this annotation
+ * Fields of android.support.v4.app.FragmentActivity marked with this annotation
  * will be kept alive as long as retained fragments are alive.
  *
  * If you want to include null-check to avoid saving null value,
- * also add {@link android.support.annotation.NonNull} annotation.
+ * also add android.support.annotation.NonNull annotation.
  */
 @Target(value = ElementType.FIELD)
 public @interface Retain {}
