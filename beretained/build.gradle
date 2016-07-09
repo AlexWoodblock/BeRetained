@@ -23,7 +23,7 @@ android {
 
 dependencies {
     compile project(':beretained-annotations')
-    compile 'com.android.support:support-v4:23.4.0'
+    provided 'com.android.support:support-v4:23.4.0'
 }
 
 install {
@@ -69,7 +69,10 @@ tasks.withType(JavaCompile) {
 task androidJavadocs(type: Javadoc) {
     source = android.sourceSets.main.java.srcDirs
     classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-    classpath += fileTree(dir: '$buildDir/intermediates/exploded-aar/', include:'**/classes.jar')
+}
+
+androidJavadocs.doFirst {
+    classpath += fileTree(dir: "$buildDir/intermediates/exploded-aar/", include:"**/classes.jar")
 }
 
 task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
