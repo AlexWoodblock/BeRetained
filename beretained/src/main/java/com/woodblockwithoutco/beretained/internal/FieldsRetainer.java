@@ -16,12 +16,13 @@
     specific language governing permissions and limitations
     under the License.
  */
-package com.woodblockwithoutco.beretained;
+package com.woodblockwithoutco.beretained.internal;
 
 /**
- * Internal interface for classes that can save/re
+ * DO NOT USE. MAY BE CHANGED IN THE FUTURE WITHOUT NOTICE.
+ * Interface for classes that can save/restore it's fields.
  */
-interface FieldsRetainer<T> {
+public interface FieldsRetainer<T> {
     void onCreate(T source);
     void save(T source);
     boolean restore(T target);
