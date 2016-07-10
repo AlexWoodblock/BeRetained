@@ -31,10 +31,21 @@ import javax.lang.model.util.Types;
 
 import static javax.tools.Diagnostic.Kind.ERROR;
 
+/**
+ * Helper class to find fitting Fragment class for closest superclass of Activity that also uses retained fields.
+ */
 public final class SuperBeRetainedFragmentTypeFinder {
 
     private SuperBeRetainedFragmentTypeFinder() {}
 
+    /**
+     * Find fitting Fragment superclass for BeRetained fragment for Activity that extends from Activity that also uses retained fields.
+     * @param type TypeMirror for current type we are processing
+     * @param superRetainEnabledTypes Collection of types that have retained fields(excluding the class we are currently processing).
+     * @param typeUtils Type utils from processing environment.
+     * @param messager Messager for error logging.
+     * @return TypeName of the Fragment that needs to be a superclass for generated Fragment or null if not found.
+     */
     public static TypeName getSuperBeRetainedFragment(TypeMirror type,
                                                       Collection<TypeMirror> superRetainEnabledTypes,
                                                       Types typeUtils,
