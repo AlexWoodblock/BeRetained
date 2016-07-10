@@ -66,3 +66,29 @@ public class SubclassSampleActivity extends SampleActivity {
 ```
 
 And that's it! Both objects from superclass and inherited class will be retained.
+
+#Installation
+Add apt plugin dependency to your project-level ```build.gradle```:
+```
+buildscript {
+    dependencies {
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
+    }
+}
+```
+
+Apply apt plugin - add the following line to the top of your module-level ```build.gradle```:
+```
+apply plugin: 'com.neenbedankt.android-apt'
+```
+
+Then add compile dependency for Android bridge to generated classes
+and apt dependency for annotations processor, and you're all set.
+```
+dependencies {
+    compile 'com.woodblockwithoutco:beretained:x.y.z'
+    apt 'com.woodblockwithoutco:beretained-processor:x.y.z'
+}
+```
+
+x.y.z is the latest version available - check it on the top of README.

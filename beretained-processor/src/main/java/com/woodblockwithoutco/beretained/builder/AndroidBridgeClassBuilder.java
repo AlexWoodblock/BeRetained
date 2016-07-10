@@ -36,8 +36,6 @@ import javax.lang.model.type.TypeMirror;
  */
 public class AndroidBridgeClassBuilder extends SaveRestoreClassBuilder {
 
-    private static final String TARGET_PKG = "com.woodblockwithoutco.beretained";
-
     private String fragmentManagerTag; //tag for retained fragment
     private ClassName beRetainedFragmentClass; //storing retained fragment class for JavaPoet usage
 
@@ -48,7 +46,7 @@ public class AndroidBridgeClassBuilder extends SaveRestoreClassBuilder {
             fragmentManagerTag = enclosingClass.simpleName() + "_BeRetainedFragment";
 
             beRetainedFragmentClass = ClassName.get(enclosingClass.packageName(), enclosingClass.simpleName() + Suffixes.BERETAINED_FRAGMENT_SUFFIX);
-            saveRestoreClassBuilder.addSuperinterface(ParameterizedTypeName.get(AndroidClasses.COM_WOODBLOCKWITHOUTCO_BERETAINED_FIELDS_RETAINER, enclosingClass));
+            saveRestoreClassBuilder.addSuperinterface(ParameterizedTypeName.get(AndroidClasses.COM_WOODBLOCKWITHOUTCO_BERETAINED_INTERNAL_FIELDS_RETAINER, enclosingClass));
             saveRestoreClassBuilder.addModifiers(Modifier.PUBLIC);
         }
     }
@@ -135,10 +133,5 @@ public class AndroidBridgeClassBuilder extends SaveRestoreClassBuilder {
         MethodSpec.Builder restoreMethodSkeleton = super.getRestoreMethodSkeleton();
         restoreMethodSkeleton.addAnnotation(Override.class);
         return restoreMethodSkeleton;
-    }
-
-    @Override
-    protected String getTargetPackage() {
-        return TARGET_PKG;
     }
 }

@@ -20,6 +20,8 @@ package com.woodblockwithoutco.beretained;
 
 import android.support.v4.app.FragmentActivity;
 
+import com.woodblockwithoutco.beretained.internal.FieldsRetainer;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
@@ -66,8 +68,6 @@ public final class BeRetained {
      * Suffix for classes which will contain static methods to trigger saving/restoring.
      */
     private static final String FIELDS_RETAINER_SUFFIX = "FieldsRetainer";
-
-    private static final String FIELDS_RETAINER_PACKAGE = "com.woodblockwithoutco.beretained";
 
     private final static Map<Class<?>, FieldsRetainer<?>> FIELDS_RETAINER_MAP = new HashMap<>();
 
@@ -164,7 +164,7 @@ public final class BeRetained {
 
     private static Class<?> getRetainerClass(Class<?> clazz) {
         try {
-            return Class.forName(FIELDS_RETAINER_PACKAGE + "." + clazz.getSimpleName() + FIELDS_RETAINER_SUFFIX);
+            return Class.forName(clazz.getSimpleName() + FIELDS_RETAINER_SUFFIX);
         } catch (ClassNotFoundException e) {
             return null;
         }
