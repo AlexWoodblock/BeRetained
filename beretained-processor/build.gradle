@@ -6,11 +6,11 @@ sourceCompatibility = project.sourceCompatibilityVersion
 targetCompatibility = project.targetCompatibilityVersion
 
 dependencies {
-    compile project(':beretained-annotations')
-    compile 'com.google.auto.service:auto-service:1.0-rc2'
-    compile 'com.squareup:javapoet:1.7.0'
+    compile deps.beretained_annotations
+    compile deps.autoservice
+    compile deps.javapoet
 
-    testCompile 'junit:junit:4.12'
+    testCompile deps.junit
 }
 
 apply from: rootProject.file('gradle/upload.gradle')

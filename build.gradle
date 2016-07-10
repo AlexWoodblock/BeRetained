@@ -28,6 +28,17 @@ ext {
     versionName = VERSION
 }
 
+ext.deps = [
+        support_v4: 'com.android.support:support-v4:23.4.0',
+
+        beretained_annotations: 'com.woodblockwithoutco:beretained-annotations:0.1.1',
+
+        javapoet: 'com.squareup:javapoet:1.7.0',
+        autoservice: 'com.google.auto.service:auto-service:1.0-rc2',
+
+        junit: 'junit:junit:4.12'
+]
+
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
