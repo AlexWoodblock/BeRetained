@@ -22,8 +22,10 @@ import com.google.auto.service.AutoService;
 import com.squareup.javapoet.JavaFile;
 import com.woodblockwithouco.beretained.Retain;
 import com.woodblockwithoutco.beretained.android.AndroidClasses;
-import com.woodblockwithoutco.beretained.builder.AndroidBridgeClassBuilder;
+import com.woodblockwithoutco.beretained.builder.FieldsRetainedClassBuilder;
+import com.woodblockwithoutco.beretained.builder.BeRetainedFragmentClassBuilder;
 import com.woodblockwithoutco.beretained.builder.SupportBeRetainedFragmentClassBuilder;
+import com.woodblockwithoutco.beretained.builder.SupportFieldsRetainerClassBuilder;
 import com.woodblockwithoutco.beretained.info.RetainedFieldDescription;
 
 import java.io.IOException;
@@ -134,7 +136,7 @@ public class BeRetainedProcessor extends AbstractProcessor {
             //build the set that doesn't contain current type - it's used to search for inheritance
             Set<TypeMirror> retainEnabledClassesWithoutEnclosingType = new HashSet<>(retainEnabledClasses);
             retainEnabledClassesWithoutEnclosingType.remove(enclosingType);
-            writeBeRetainedClasses(classFieldMap.get(enclosingType),
+            writeSupportBeRetainedClasses(classFieldMap.get(enclosingType),
                     enclosingType,
                     retainEnabledClassesWithoutEnclosingType);
         }
@@ -206,11 +208,11 @@ public class BeRetainedProcessor extends AbstractProcessor {
         return false;
     }
 
-    private void writeBeRetainedClasses(List<RetainedFieldDescription> fields,
+    private void writeSupportBeRetainedClasses(List<RetainedFieldDescription> fields,
                                         TypeMirror enclosingClass,
                                         Collection<TypeMirror> retainEnabledClasses) {
 
-        SupportBeRetainedFragmentClassBuilder beRetainedFragmentBuilder = new SupportBeRetainedFragmentClassBuilder(
+        BeRetainedFragmentClassBuilder beRetainedFragmentBuilder = new SupportBeRetainedFragmentClassBuilder(
                 enclosingClass,
                 messager,
                 retainEnabledClasses,
@@ -224,7 +226,7 @@ public class BeRetainedProcessor extends AbstractProcessor {
         JavaFile fragment = beRetainedFragmentBuilder.build();
         writeJavaFile(fragment);
 
-        AndroidBridgeClassBuilder bridgeClassBuilder = new AndroidBridgeClassBuilder(enclosingClass, messager);
+        FieldsRetainedClassBuilder bridgeClassBuilder = new SupportFieldsRetainerClassBuilder(enclosingClass, messager);
         bridgeClassBuilder.addBody();
         writeJavaFile(bridgeClassBuilder.build());
     }
