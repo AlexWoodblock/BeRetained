@@ -67,7 +67,7 @@ public final class BeRetained {
     /**
      * Suffix for classes which will contain static methods to trigger saving/restoring.
      */
-    private static final String FIELDS_RETAINER_SUFFIX = "FieldsRetainer";
+    private static final String FIELDS_RETAINER_SUFFIX = "$$FieldsRetainer";
 
     private final static Map<Class<?>, FieldsRetainer<?>> FIELDS_RETAINER_MAP = new HashMap<>();
 
