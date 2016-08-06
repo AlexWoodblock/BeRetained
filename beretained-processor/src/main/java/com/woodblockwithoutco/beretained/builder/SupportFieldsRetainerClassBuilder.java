@@ -9,7 +9,7 @@ import javax.lang.model.type.TypeMirror;
 /**
  * Created by aleksandr on 8/6/16.
  */
-public class SupportFieldsRetainerClassBuilder extends FieldsRetainedClassBuilder {
+public class SupportFieldsRetainerClassBuilder extends FieldsRetainerClassBuilder {
 
     public SupportFieldsRetainerClassBuilder(TypeMirror retainEnabledType, Messager messager) {
         super(retainEnabledType, messager);

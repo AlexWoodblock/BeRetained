@@ -22,7 +22,7 @@ import com.google.auto.service.AutoService;
 import com.squareup.javapoet.JavaFile;
 import com.woodblockwithouco.beretained.Retain;
 import com.woodblockwithoutco.beretained.android.AndroidClasses;
-import com.woodblockwithoutco.beretained.builder.FieldsRetainedClassBuilder;
+import com.woodblockwithoutco.beretained.builder.FieldsRetainerClassBuilder;
 import com.woodblockwithoutco.beretained.builder.BeRetainedFragmentClassBuilder;
 import com.woodblockwithoutco.beretained.builder.SupportBeRetainedFragmentClassBuilder;
 import com.woodblockwithoutco.beretained.builder.SupportFieldsRetainerClassBuilder;
@@ -226,7 +226,7 @@ public class BeRetainedProcessor extends AbstractProcessor {
         JavaFile fragment = beRetainedFragmentBuilder.build();
         writeJavaFile(fragment);
 
-        FieldsRetainedClassBuilder bridgeClassBuilder = new SupportFieldsRetainerClassBuilder(enclosingClass, messager);
+        FieldsRetainerClassBuilder bridgeClassBuilder = new SupportFieldsRetainerClassBuilder(enclosingClass, messager);
         bridgeClassBuilder.addBody();
         writeJavaFile(bridgeClassBuilder.build());
     }

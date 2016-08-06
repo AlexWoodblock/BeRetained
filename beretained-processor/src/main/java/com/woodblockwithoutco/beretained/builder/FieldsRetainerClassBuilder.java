@@ -35,12 +35,12 @@ import javax.lang.model.type.TypeMirror;
  * Class builder for &lt;ActivityName&gt;FieldsRetainer -
  * classes that Activities will have to call in order to save/restore fields.
  */
-public abstract class FieldsRetainedClassBuilder extends SaveRestoreClassBuilder {
+public abstract class FieldsRetainerClassBuilder extends SaveRestoreClassBuilder {
 
     private String fragmentManagerTag; //tag for retained fragment
     private ClassName beRetainedFragmentClass; //storing retained fragment class for JavaPoet usage
 
-    public FieldsRetainedClassBuilder(TypeMirror retainEnabledType, Messager messager) {
+    public FieldsRetainerClassBuilder(TypeMirror retainEnabledType, Messager messager) {
         super(retainEnabledType, messager);
 
         if(enclosingClass != null) {
