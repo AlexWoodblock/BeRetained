@@ -18,26 +18,29 @@
  */
 package com.woodblockwithoutco.beretainedexample;
 
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.FragmentManager;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.TypefaceSpan;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toolbar;
 
 import com.woodblockwithouco.beretained.Retain;
 import com.woodblockwithoutco.beretained.BeRetained;
-import com.woodblockwithoutco.beretainedexample.widget.support.RecyclerViewFragment;
+import com.woodblockwithoutco.beretainedexample.widget.RecyclerViewFragment;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity {
+@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+public class SecondActivity extends Activity {
 
     @Retain
     int[] mIntArray;
@@ -52,24 +55,24 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_fragment_container);
+        setContentView(R.layout.activity_non_support_fragment_container);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setActionBar(toolbar);
 
         //we must always call BeRetained.onCreate()
         BeRetained.onCreate(this);
 
         boolean wasRestored = BeRetained.restore(this);
         if(wasRestored) {
-            setTitle(R.string.retained);
+            setTitle(R.string.retained_non_support);
         } else {
-            setTitle(R.string.not_retained);
+            setTitle(R.string.not_retained_non_support);
         }
 
         fillInitialValues();
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentManager fragmentManager = getFragmentManager();
         RecyclerViewFragment recyclerViewFragment = (RecyclerViewFragment) fragmentManager.findFragmentById(R.id.container);
         if(recyclerViewFragment == null) {
             recyclerViewFragment = new RecyclerViewFragment();
@@ -96,9 +99,6 @@ public class MainActivity extends AppCompatActivity {
         int id = menuItem.getItemId();
         if(id == R.id.open_sub_main_activity) {
             startActivity(new Intent(this, SubMainActivity.class));
-            return true;
-        } else if(id == R.id.open_non_support_activity) {
-            startActivity(new Intent(this, SecondActivity.class));
             return true;
         }
 
