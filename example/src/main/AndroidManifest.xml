@@ -19,6 +19,9 @@
 
         <activity android:name=".SubMainActivity"
                   android:exported="false"/>
+
+        <activity android:name=".SecondActivity"
+                  android:exported="false"/>
     </application>
 
 </manifest>

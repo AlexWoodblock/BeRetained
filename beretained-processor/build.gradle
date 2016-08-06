@@ -24,7 +24,7 @@ sourceCompatibility = project.sourceCompatibilityVersion
 targetCompatibility = project.targetCompatibilityVersion
 
 dependencies {
-    compile deps.beretained_annotations
+    compile project(':beretained-annotations')
     compile deps.autoservice
     compile deps.javapoet
 

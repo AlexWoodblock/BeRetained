@@ -23,6 +23,7 @@ import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
+import com.squareup.javapoet.TypeName;
 import com.woodblockwithoutco.beretained.android.AndroidClasses;
 import com.woodblockwithoutco.beretained.android.Suffixes;
 
@@ -34,19 +35,22 @@ import javax.lang.model.type.TypeMirror;
  * Class builder for &lt;ActivityName&gt;FieldsRetainer -
  * classes that Activities will have to call in order to save/restore fields.
  */
-public class AndroidBridgeClassBuilder extends SaveRestoreClassBuilder {
+public abstract class FieldsRetainerClassBuilder extends SaveRestoreClassBuilder {
 
     private String fragmentManagerTag; //tag for retained fragment
     private ClassName beRetainedFragmentClass; //storing retained fragment class for JavaPoet usage
 
-    public AndroidBridgeClassBuilder(TypeMirror retainEnabledType, Messager messager) {
+    public FieldsRetainerClassBuilder(TypeMirror retainEnabledType, Messager messager) {
         super(retainEnabledType, messager);
 
         if(enclosingClass != null) {
             fragmentManagerTag = enclosingClass.simpleName() + "_BeRetainedFragment";
 
-            beRetainedFragmentClass = ClassName.get(enclosingClass.packageName(), enclosingClass.simpleName() + Suffixes.BERETAINED_FRAGMENT_SUFFIX);
-            saveRestoreClassBuilder.addSuperinterface(ParameterizedTypeName.get(AndroidClasses.COM_WOODBLOCKWITHOUTCO_BERETAINED_INTERNAL_FIELDS_RETAINER, enclosingClass));
+            beRetainedFragmentClass = ClassName.get(
+                    enclosingClass.packageName(), enclosingClass.simpleName() + Suffixes.BERETAINED_FRAGMENT_SUFFIX);
+            saveRestoreClassBuilder.addSuperinterface(
+                    ParameterizedTypeName.get(AndroidClasses.COM_WOODBLOCKWITHOUTCO_BERETAINED_INTERNAL_FIELDS_RETAINER,
+                    enclosingClass));
             saveRestoreClassBuilder.addModifiers(Modifier.PUBLIC);
         }
     }
@@ -60,7 +64,7 @@ public class AndroidBridgeClassBuilder extends SaveRestoreClassBuilder {
     protected CodeBlock getSaveMethodCode(String sourceArgName) {
         //finding fragment, if it's null - throwing exception, if it's there - put instances into it
         CodeBlock.Builder saveCode = CodeBlock.builder().
-                addStatement("$T fm = $L.getSupportFragmentManager()", AndroidClasses.ANDROID_SUPPORT_V4_APP_FRAGMENT_MANAGER_CLASS, sourceArgName).
+                addStatement("$T fm = $L.$L()", getFragmentManagerTypeName(), sourceArgName, getGetFragmentManagerMethodName()).
                 addStatement("$T fragment = ($T) fm.findFragmentByTag($S)", beRetainedFragmentClass, beRetainedFragmentClass, fragmentManagerTag).
                 beginControlFlow("if (fragment == null)").
                 addStatement("throw new NullPointerException($S)", "Did you forget to call " + enclosingClass.simpleName() + Suffixes.FIELDS_RETAINER_SUFFIX + ".onCreate() inside onCreate(Bundle) method?").
@@ -70,12 +74,16 @@ public class AndroidBridgeClassBuilder extends SaveRestoreClassBuilder {
         return saveCode.build();
     }
 
+    protected abstract String getGetFragmentManagerMethodName();
+
+    protected abstract TypeName getFragmentManagerTypeName();
+
     @Override
     protected CodeBlock getRestoreMethodCode(String targetArgName) {
         //finding fragment, if it's not there - adding it to FragmentManager,
         //and after all try to restore instances from it.
         CodeBlock.Builder restoreCode = CodeBlock.builder().
-                addStatement("$T fm = $L.getSupportFragmentManager()", AndroidClasses.ANDROID_SUPPORT_V4_APP_FRAGMENT_MANAGER_CLASS, targetArgName).
+                addStatement("$T fm = $L.$L()", getFragmentManagerTypeName(), targetArgName, getGetFragmentManagerMethodName()).
                 addStatement("$T fragment = ($T) fm.findFragmentByTag($S)", beRetainedFragmentClass, beRetainedFragmentClass, fragmentManagerTag).
                 beginControlFlow("if(fragment == null)").
                 addStatement("throw new NullPointerException($S)", "Did you forget to call " + enclosingClass.simpleName() + Suffixes.FIELDS_RETAINER_SUFFIX + ".onCreate() inside onCreate(Bundle) method?").
@@ -99,7 +107,7 @@ public class AndroidBridgeClassBuilder extends SaveRestoreClassBuilder {
         //adding onCreate method to add fragment
         final String activityArgName = "activity";
         CodeBlock.Builder onCreateCode = CodeBlock.builder().
-                addStatement("$T fm = $L.getSupportFragmentManager()", AndroidClasses.ANDROID_SUPPORT_V4_APP_FRAGMENT_MANAGER_CLASS, activityArgName).
+                addStatement("$T fm = $L.$L()", getFragmentManagerTypeName(), activityArgName, getGetFragmentManagerMethodName()).
                 addStatement("$T fragment = ($T) fm.findFragmentByTag($S)", beRetainedFragmentClass, beRetainedFragmentClass, fragmentManagerTag).
                 beginControlFlow("if(fragment == null)").
                 addStatement("fragment = new $T()", beRetainedFragmentClass).

@@ -33,5 +33,5 @@ public final class Suffixes {
     /**
      * Suffix for classes which will contain static methods to trigger saving/restoring.
      */
-    public static final String FIELDS_RETAINER_SUFFIX = "FieldsRetainer";
+    public static final String FIELDS_RETAINER_SUFFIX = "$$FieldsRetainer";
 }

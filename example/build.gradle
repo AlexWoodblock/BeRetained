@@ -41,6 +41,6 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:23.4.0'
     compile 'com.android.support:support-annotations:23.4.0'
 
-    compile 'com.woodblockwithoutco:beretained:0.1.1'
-    apt 'com.woodblockwithoutco:beretained-processor:0.1.1'
+    compile project(':beretained')
+    apt project(':beretained-processor')
 }

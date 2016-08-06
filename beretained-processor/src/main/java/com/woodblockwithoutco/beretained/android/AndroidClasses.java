@@ -29,11 +29,17 @@ public final class AndroidClasses {
     private AndroidClasses() {}
 
     public static final String ANDROID_SUPPORT_V4_APP_FRAGMENT_ACTIVITY_CLASS_NAME = "android.support.v4.app.FragmentActivity";
+    public static final String ANDROID_APP_ACTIVITY_CLASS_NAME = "android.app.Activity";
 
     public static final String ANDROID_SUPPORT_ANNOTATION_NON_NULL = "@android.support.annotation.NonNull";
 
     public static final ClassName ANDROID_SUPPORT_V4_APP_FRAGMENT_MANAGER_CLASS = ClassName.get("android.support.v4.app", "FragmentManager");
     public static final ClassName ANDROID_SUPPORT_V4_APP_FRAGMENT_CLASS = ClassName.get("android.support.v4.app", "Fragment");
+
+    public static final ClassName ANDROID_APP_FRAGMENT = ClassName.get("android.app", "Fragment");
+    public static final ClassName ANDROID_APP_FRAGMENT_MANAGER = ClassName.get("android.app", "FragmentManager");
+
     public static final ClassName ANDROID_OS_BUNDLE_CLASS = ClassName.get("android.os", "Bundle");
+
     public static final ClassName COM_WOODBLOCKWITHOUTCO_BERETAINED_INTERNAL_FIELDS_RETAINER = ClassName.get("com.woodblockwithoutco.beretained.internal", "FieldsRetainer");
 }

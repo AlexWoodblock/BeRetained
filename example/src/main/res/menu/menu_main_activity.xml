@@ -2,4 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/open_sub_main_activity"
           android:title="@string/open_sub_main_activity"/>
+    <item android:id="@+id/open_non_support_activity"
+          android:title="@string/open_non_support_activity"/>
 </menu>

@@ -36,7 +36,7 @@ android {
 
 dependencies {
     provided deps.support_v4
-    compile deps.beretained_annotations
+    compile project(':beretained-annotations')
 }
 
 apply from: rootProject.file('gradle/upload.gradle')
