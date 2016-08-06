@@ -18,7 +18,7 @@
  */
 package com.woodblockwithoutco.beretained;
 
-import android.support.v4.app.FragmentActivity;
+import android.app.Activity;
 
 import com.woodblockwithoutco.beretained.internal.FieldsRetainer;
 
@@ -81,8 +81,8 @@ public final class BeRetained {
      * all fragment manipulations after this method have been called.
      * @param activity Activity that will have it's assigned retained fragment attached to it.
      */
-    public static void onCreate(FragmentActivity activity) {
-        FieldsRetainer<FragmentActivity> retainer = findFieldsRetainer(activity.getClass());
+    public static void onCreate(Activity activity) {
+        FieldsRetainer<Activity> retainer = findFieldsRetainer(activity.getClass());
         if(retainer != null) {
             retainer.onCreate(activity);
         }
@@ -93,8 +93,8 @@ public final class BeRetained {
      * @param source Activity that wants to save it's fields.
      * @throws NullPointerException Will throw NullPointerException if field marked with @NonNull and @Retain was null during this call.
      */
-    public static void save(FragmentActivity source) {
-        FieldsRetainer<FragmentActivity> retainer = findFieldsRetainer(source.getClass());
+    public static void save(Activity source) {
+        FieldsRetainer<Activity> retainer = findFieldsRetainer(source.getClass());
         if(retainer != null) {
             retainer.save(source);
         }
@@ -106,8 +106,8 @@ public final class BeRetained {
      * @return true if there are instances to restore, false otherwise.
      * @throws NullPointerException Will throw NullPointerException if saved instance for field marked with @NonNull and @Retain was null during this call.
      */
-    public static boolean restore(FragmentActivity target) {
-        FieldsRetainer<FragmentActivity> retainer = findFieldsRetainer(target.getClass());
+    public static boolean restore(Activity target) {
+        FieldsRetainer<Activity> retainer = findFieldsRetainer(target.getClass());
         if(retainer != null) {
             return retainer.restore(target);
         } else {
@@ -115,8 +115,8 @@ public final class BeRetained {
         }
     }
 
-    private static FieldsRetainer<FragmentActivity> findFieldsRetainer(Class<? extends FragmentActivity> clazz) {
-        FieldsRetainer<FragmentActivity> retainer = (FieldsRetainer<FragmentActivity>) FIELDS_RETAINER_MAP.get(clazz);
+    private static FieldsRetainer<Activity> findFieldsRetainer(Class<? extends Activity> clazz) {
+        FieldsRetainer<Activity> retainer = (FieldsRetainer<Activity>) FIELDS_RETAINER_MAP.get(clazz);
 
         if(retainer == null) {
             try {
@@ -131,7 +131,7 @@ public final class BeRetained {
                 }
 
                 if(retainerClass != null) {
-                    retainer = (FieldsRetainer<FragmentActivity>) retainerClass.getDeclaredConstructor().newInstance();
+                    retainer = (FieldsRetainer<Activity>) retainerClass.getDeclaredConstructor().newInstance();
                 } else {
                     return null;
                 }

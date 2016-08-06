@@ -24,9 +24,12 @@ import com.woodblockwithouco.beretained.Retain;
 import com.woodblockwithoutco.beretained.android.AndroidClasses;
 import com.woodblockwithoutco.beretained.builder.FieldsRetainerClassBuilder;
 import com.woodblockwithoutco.beretained.builder.BeRetainedFragmentClassBuilder;
+import com.woodblockwithoutco.beretained.builder.NonSupportBeRetainedFragmentClassBuilder;
+import com.woodblockwithoutco.beretained.builder.NonSupportFieldsRetainerClassBuilder;
 import com.woodblockwithoutco.beretained.builder.SupportBeRetainedFragmentClassBuilder;
 import com.woodblockwithoutco.beretained.builder.SupportFieldsRetainerClassBuilder;
 import com.woodblockwithoutco.beretained.info.RetainedFieldDescription;
+import com.woodblockwithoutco.beretained.utils.TypeMirrorInheritanceChecker;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -56,12 +59,19 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
 import static javax.tools.Diagnostic.Kind.ERROR;
+import static javax.tools.Diagnostic.Kind.NOTE;
 
 /**
  * The annotation processor that handles @Retain annotations.
  */
 @AutoService(Processor.class)
 public class BeRetainedProcessor extends AbstractProcessor {
+
+    private enum EnclosingClassType {
+        SUPPORT,
+        NON_SUPPORT,
+        INVALID
+    }
 
     private Messager messager;
     private Filer filer;
@@ -96,18 +106,22 @@ public class BeRetainedProcessor extends AbstractProcessor {
                 new HashSet<>(); //complete set of all retain-enabled classes
         final Map<TypeMirror, List<RetainedFieldDescription>> classFieldMap =
                 new HashMap<>(); //retain-enabled-class -> list of retained fields
+        final Map<TypeMirror, EnclosingClassType> enclosingClassTypes = new HashMap<>();
 
         for (VariableElement field : retainedFields) {
             TypeMirror fieldType = field.asType();
             String fieldName = field.getSimpleName().toString();
 
-            if (!validate(field)) {
+            EnclosingClassType typeOfEnclosingClass = validateAndGetEnclosingClassType(field);
+            if (EnclosingClassType.INVALID.equals(typeOfEnclosingClass)) {
                 //stop the processing if field is invalid
                 return true;
             }
 
             TypeMirror enclosingClassType = field.getEnclosingElement().asType(); //type that contains retained fields
             retainEnabledClasses.add(enclosingClassType);
+
+            enclosingClassTypes.put(enclosingClassType, typeOfEnclosingClass);
 
             List<RetainedFieldDescription> fields = classFieldMap.get(enclosingClassType);
             if (fields == null) {
@@ -136,16 +150,17 @@ public class BeRetainedProcessor extends AbstractProcessor {
             //build the set that doesn't contain current type - it's used to search for inheritance
             Set<TypeMirror> retainEnabledClassesWithoutEnclosingType = new HashSet<>(retainEnabledClasses);
             retainEnabledClassesWithoutEnclosingType.remove(enclosingType);
-            writeSupportBeRetainedClasses(classFieldMap.get(enclosingType),
+            writeBeRetainedClasses(classFieldMap.get(enclosingType),
                     enclosingType,
-                    retainEnabledClassesWithoutEnclosingType);
+                    retainEnabledClassesWithoutEnclosingType,
+                    enclosingClassTypes.get(enclosingType));
         }
 
         return true;
     }
 
     //validate field - it should not be final or private
-    private boolean validate(VariableElement element) {
+    private EnclosingClassType validateAndGetEnclosingClassType(VariableElement element) {
         //must be package-accessible, protected or public
         if (element.getModifiers().contains(Modifier.PRIVATE)) {
             messager.printMessage(ERROR, element.getSimpleName() +
@@ -154,7 +169,7 @@ public class BeRetainedProcessor extends AbstractProcessor {
                             " must have package, protected or public access modifier",
                     element);
 
-            return false;
+            return EnclosingClassType.INVALID;
         }
 
         //must not be final
@@ -164,7 +179,7 @@ public class BeRetainedProcessor extends AbstractProcessor {
                             element.getEnclosingElement().asType().toString() +
                             " must not be final",
                     element);
-            return false;
+            return EnclosingClassType.INVALID;
         }
 
         //this is something I can't imagine happening - fields that are not in the class - but let's check it,
@@ -173,60 +188,84 @@ public class BeRetainedProcessor extends AbstractProcessor {
         TypeElement typeElement = elements.getTypeElement(enclosingClass.asType().toString());
         if(typeElement == null) {
             messager.printMessage(ERROR, "Enclosing type must be a class, but it's a " + enclosingClass.asType().toString(), element);
-            return false;
+            return EnclosingClassType.INVALID;
         }
 
-        //check if fields marked with @Retain are in FragmentActivity
+        //check if fields marked with @Retain are in FragmentActivity or Activity
         boolean enclosedInFragmentActivity = validateIsEnclosedInFragmentActivity(enclosingClass.asType());
+        boolean enclosedInActivity = validateIsEnclosedInActivity(enclosingClass.asType());
 
-        if(!enclosedInFragmentActivity) {
+        messager.printMessage(NOTE, "Enclosing class: " + enclosingClass.toString());
+        messager.printMessage(NOTE, "Is Activity: " + enclosedInActivity);
+        messager.printMessage(NOTE, "Is FragmentActivity: " + enclosedInFragmentActivity);
+
+        if(!enclosedInFragmentActivity && !enclosedInActivity) {
             messager.printMessage(ERROR,
                     "Fields marked with @Retain annotation must be placed in " +
                             AndroidClasses.ANDROID_SUPPORT_V4_APP_FRAGMENT_ACTIVITY_CLASS_NAME +
-                            " or it's subclass!",
+                            " or " +
+                            AndroidClasses.ANDROID_APP_ACTIVITY_CLASS_NAME +
+                            " or their subclasses!",
                     element);
-            return false;
+            return EnclosingClassType.INVALID;
         }
 
-        return true;
+        return enclosedInFragmentActivity ? EnclosingClassType.SUPPORT : EnclosingClassType.NON_SUPPORT;
     }
 
     //check if class containing @Retain fields is FragmentActivity or it's subclasses
     private boolean validateIsEnclosedInFragmentActivity(TypeMirror enclosingType) {
-        if(AndroidClasses.ANDROID_SUPPORT_V4_APP_FRAGMENT_ACTIVITY_CLASS_NAME.equals(enclosingType.toString())) {
-            return true;
-        }
-
-        //as classes should appear first in the list, only check them
-        List<? extends TypeMirror> supertypes = types.directSupertypes(enclosingType);
-        if(supertypes.size() > 0) {
-            if(validateIsEnclosedInFragmentActivity(supertypes.get(0))) {
-                return true;
-            }
-        }
-
-        return false;
+        return TypeMirrorInheritanceChecker.checkTypeMirrorInheritance(enclosingType,
+                AndroidClasses.ANDROID_SUPPORT_V4_APP_FRAGMENT_ACTIVITY_CLASS_NAME,
+                types);
     }
 
-    private void writeSupportBeRetainedClasses(List<RetainedFieldDescription> fields,
-                                        TypeMirror enclosingClass,
-                                        Collection<TypeMirror> retainEnabledClasses) {
+    private boolean validateIsEnclosedInActivity(TypeMirror enclosingType) {
+        return TypeMirrorInheritanceChecker.checkTypeMirrorInheritance(enclosingType,
+                AndroidClasses.ANDROID_APP_ACTIVITY_CLASS_NAME,
+                types);
+    }
 
-        BeRetainedFragmentClassBuilder beRetainedFragmentBuilder = new SupportBeRetainedFragmentClassBuilder(
-                enclosingClass,
-                messager,
-                retainEnabledClasses,
-                types
-        );
+    private void writeBeRetainedClasses(List<RetainedFieldDescription> fields,
+                                        TypeMirror enclosingClass,
+                                        Collection<TypeMirror> retainEnabledClasses,
+                                        EnclosingClassType enclosingClassType) {
+
+        BeRetainedFragmentClassBuilder beRetainedFragmentClassBuilder = null;
+        FieldsRetainerClassBuilder bridgeClassBuilder = null;
+        switch (enclosingClassType) {
+            case SUPPORT:
+                beRetainedFragmentClassBuilder =
+                        new SupportBeRetainedFragmentClassBuilder(
+                                enclosingClass,
+                                messager,
+                                retainEnabledClasses,
+                                types
+                        );
+                bridgeClassBuilder = new SupportFieldsRetainerClassBuilder(enclosingClass, messager);
+                break;
+            case NON_SUPPORT:
+                beRetainedFragmentClassBuilder =
+                        new NonSupportBeRetainedFragmentClassBuilder(
+                                enclosingClass,
+                                messager,
+                                retainEnabledClasses,
+                                types
+                        );
+                bridgeClassBuilder = new NonSupportFieldsRetainerClassBuilder(enclosingClass, messager);
+                break;
+            case INVALID:
+                throw new IllegalArgumentException("Can't create BeRetained classes for INVALID EnclosingClassType");
+
+        }
 
         //these calls must be in this exact order, otherwise addBody() won't have any fields to add
-        beRetainedFragmentBuilder.setFields(fields);
-        beRetainedFragmentBuilder.addBody();
+        beRetainedFragmentClassBuilder.setFields(fields);
+        beRetainedFragmentClassBuilder.addBody();
 
-        JavaFile fragment = beRetainedFragmentBuilder.build();
+        JavaFile fragment = beRetainedFragmentClassBuilder.build();
         writeJavaFile(fragment);
 
-        FieldsRetainerClassBuilder bridgeClassBuilder = new SupportFieldsRetainerClassBuilder(enclosingClass, messager);
         bridgeClassBuilder.addBody();
         writeJavaFile(bridgeClassBuilder.build());
     }
