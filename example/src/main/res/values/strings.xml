@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">BeRetained Example</string>
     <string name="retained">Instances retained</string>
-    <string name="retained_non_support">Instances retained (non-supported)</string>
+    <string name="retained_non_support">Instances retained (non-support)</string>
     <string name="not_retained">Instances not retained</string>
     <string name="not_retained_non_support">Instances not retained (non-support)</string>
     <string name="open_sub_main_activity">Open subclass Activity</string>
