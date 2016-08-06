@@ -22,6 +22,7 @@ import android.app.Activity;
 
 import com.woodblockwithoutco.beretained.internal.FieldsRetainer;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
@@ -131,7 +132,9 @@ public final class BeRetained {
                 }
 
                 if(retainerClass != null) {
-                    retainer = (FieldsRetainer<Activity>) retainerClass.getDeclaredConstructor().newInstance();
+                    Constructor<?> constructor = retainerClass.getDeclaredConstructor();
+                    constructor.setAccessible(true);
+                    retainer = (FieldsRetainer<Activity>) constructor.newInstance();
                 } else {
                     return null;
                 }
