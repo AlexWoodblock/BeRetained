@@ -88,23 +88,6 @@ public class SecondActivity extends Activity {
         BeRetained.save(this);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main_activity, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem menuItem) {
-        int id = menuItem.getItemId();
-        if(id == R.id.open_sub_main_activity) {
-            startActivity(new Intent(this, SubMainActivity.class));
-            return true;
-        }
-
-        return super.onOptionsItemSelected(menuItem);
-    }
-
     protected CharSequence[] getItems() {
         //filling list with entries like "fieldName 0xfieldHash"
         String[] fieldNames = new String[] {
