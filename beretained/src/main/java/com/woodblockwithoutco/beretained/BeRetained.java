@@ -164,7 +164,7 @@ public final class BeRetained {
 
     private static Class<?> getRetainerClass(Class<?> clazz) {
         try {
-            return Class.forName(clazz.getSimpleName() + FIELDS_RETAINER_SUFFIX);
+            return Class.forName(clazz.getName() + FIELDS_RETAINER_SUFFIX);
         } catch (ClassNotFoundException e) {
             return null;
         }
