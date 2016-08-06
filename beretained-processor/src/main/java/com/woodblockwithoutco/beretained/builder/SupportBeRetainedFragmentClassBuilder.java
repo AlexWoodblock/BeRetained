@@ -10,7 +10,7 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 
 /**
- * Created by aleksandr on 8/6/16.
+ * Class builder for Android Support library retained Fragments that will hold instances of objects.
  */
 public class SupportBeRetainedFragmentClassBuilder extends BeRetainedFragmentClassBuilder {
 

@@ -7,7 +7,7 @@ import javax.annotation.processing.Messager;
 import javax.lang.model.type.TypeMirror;
 
 /**
- * Created by aleksandr on 8/6/16.
+ * FieldsRetainer class builder for Android Support library Activities.
  */
 public class SupportFieldsRetainerClassBuilder extends FieldsRetainerClassBuilder {
 

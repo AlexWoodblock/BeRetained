@@ -1,7 +1,5 @@
 package com.woodblockwithoutco.beretained.utils;
 
-import com.woodblockwithoutco.beretained.android.AndroidClasses;
-
 import java.util.List;
 
 import javax.lang.model.type.TypeMirror;
@@ -14,7 +12,13 @@ public final class TypeMirrorInheritanceChecker {
 
     private TypeMirrorInheritanceChecker() {}
 
-    //check if class containing @Retain fields is FragmentActivity or it's subclasses
+    /**
+     * Checks if given TypeMirror inherits from given class.
+     * @param enclosingType TypeMirror to check.
+     * @param parentClass String description of parent class.
+     * @param types TypeUtils from annotation processor.
+     * @return True if inherits, false otherwise.
+     */
     public static boolean checkTypeMirrorInheritance(TypeMirror enclosingType, String parentClass, Types types) {
         if(parentClass.equals(enclosingType.toString())) {
             return true;

@@ -22,8 +22,8 @@ import com.google.auto.service.AutoService;
 import com.squareup.javapoet.JavaFile;
 import com.woodblockwithouco.beretained.Retain;
 import com.woodblockwithoutco.beretained.android.AndroidClasses;
-import com.woodblockwithoutco.beretained.builder.FieldsRetainerClassBuilder;
 import com.woodblockwithoutco.beretained.builder.BeRetainedFragmentClassBuilder;
+import com.woodblockwithoutco.beretained.builder.FieldsRetainerClassBuilder;
 import com.woodblockwithoutco.beretained.builder.NonSupportBeRetainedFragmentClassBuilder;
 import com.woodblockwithoutco.beretained.builder.NonSupportFieldsRetainerClassBuilder;
 import com.woodblockwithoutco.beretained.builder.SupportBeRetainedFragmentClassBuilder;
@@ -220,6 +220,7 @@ public class BeRetainedProcessor extends AbstractProcessor {
                 types);
     }
 
+    //check if class containing @Retain fields is Activity or it's subclasses
     private boolean validateIsEnclosedInActivity(TypeMirror enclosingType) {
         return TypeMirrorInheritanceChecker.checkTypeMirrorInheritance(enclosingType,
                 AndroidClasses.ANDROID_APP_ACTIVITY_CLASS_NAME,
