@@ -1,5 +1,7 @@
 [ ![Download](https://api.bintray.com/packages/drbreen/maven/com.woodblockwithoutco.beretained-processor/images/download.svg) ](https://bintray.com/drbreen/maven/com.woodblockwithoutco.beretained-processor/_latestVersion)
 
+# This is, of course, is now deprecated as there are much better ways to retain your state on config changes (ViewModels, for example). However, it is a good starting point for writing your annotation processor.
+
 # BeRetained
 BeRetained is a simple library that will handle non-parcelable instances saving for configuration changes.
 
